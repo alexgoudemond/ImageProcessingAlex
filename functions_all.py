@@ -471,8 +471,8 @@ def executeEnhancement(intVal, img, imgName, c, gamma):
         thresholding(img, imgName)
     elif (intVal == 4):
         logTransform(img, imgName)
-    # else:
-        
+    else:
+        gammaTransform(img, imgName, c, gamma)        
 
     message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
     cv2.imshow(message, img)
@@ -481,6 +481,21 @@ def executeEnhancement(intVal, img, imgName, c, gamma):
     displayHist(img, message, 1)
 
     plt.show()       
+###
+
+def gammaTransform(img, imgName, cValue, gammaValue):
+    imageEnhanced = np.array(cValue*np.power(img,gammaValue))
+
+    message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(imageEnhanced, message, 2)
+
+    message = "Power law (Gamma) Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
+    plt.figure(4)
+    plt.imshow(imageEnhanced)
+    plt.title(message)
+
+    message = "Transformation Function: "
+    TransformationFunction(message, img, imageEnhanced, 3)
 ###
 
 def logTransform(img, imgName):

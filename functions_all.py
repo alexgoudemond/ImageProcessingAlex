@@ -467,23 +467,36 @@ def executeEnhancement(intVal, img, imgName, c, gamma):
         histEqualization(img, imgName)
     elif (intVal == 2):
         negImage(img, imgName)
-    # elif (intVal == 3):
-        
+    elif (intVal == 3):
+        thresholding(img, imgName)
     # elif (intVal == 4):
         
     # else:
+        
 
-    # TransformationFunction(img, imageEnhanced)
-    plt.show()       
-###
-
-def negImage(img, imgName):
     message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
     cv2.imshow(message, img)
-
+    
     message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
     displayHist(img, message, 1)
 
+    plt.show()       
+###
+
+def thresholding(img, imgName):
+    imageEnhanced = cv2.adaptiveThreshold(src=img, maxValue=255, adaptiveMethod=cv2.BORDER_REPLICATE, thresholdType=cv2.THRESH_BINARY,blockSize=3, C=10)
+    
+    message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(imageEnhanced, message, 2)
+
+    message = "Thresholding of Image: " + getName(imgName) + "." + getExtension(imgName)
+    cv2.imshow(message, imageEnhanced)
+    
+    message = "Transformation Function: "
+    TransformationFunction(message, img, imageEnhanced, 3)
+###
+
+def negImage(img, imgName):
     imageEnhanced = cv2.bitwise_not(img)
     
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
@@ -496,13 +509,7 @@ def negImage(img, imgName):
     TransformationFunction(message, img, imageEnhanced, 3)
 ###
 
-def histEqualization(img, imgName):
-    message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
-    cv2.imshow(message, img)
-
-    message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(img, message, 1)
-    
+def histEqualization(img, imgName):    
     imgEnhanced = cv2.equalizeHist(img)
 
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
@@ -510,6 +517,9 @@ def histEqualization(img, imgName):
     
     message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
     cv2.imshow(message, imgEnhanced)
+
+    message = "Transformation Function: "
+    TransformationFunction(message, img, imgEnhanced, 3)
 ###
 
 # # Select an image to enhance, then prep window, then enhance

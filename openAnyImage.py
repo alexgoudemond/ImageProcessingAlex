@@ -129,7 +129,7 @@ buttonEnhance = tk.Button(
     width = 25,
     height = 5, 
     bg = "silver",
-    command = chooseEnhancement
+    # command = chooseEnhancement
 )
 button6 = tk.Button(
     master = buttonFrameMiddle,

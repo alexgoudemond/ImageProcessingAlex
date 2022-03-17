@@ -400,119 +400,123 @@ def getAllOfMatrix(image, x, y, name):
 ###
 
 #------------------------------------------------------------------------------------Enhancement Functions Below----------------
-
-# Select an image to enhance, then prep window, then enhance
-def chooseEnhancement():
-    window.filename = openGUI()
-
-    imgGrayscale, success = getGray()
-
-    if(success):
-        prepLayout(imgGrayscale, window.filename)
-    else:
-        tellUser("Unable to Open Enhancement Window...", labelUpdates)
-###
-
-def prepLayout(img, windowFilename):
-    windowEnhancements = Toplevel(window)
-    windowEnhancements.title("Image Enhancements Below")
-    windowEnhancements.geometry("1000x1000")
-
-    topFrame = tk.Frame(master=windowEnhancements) 
-    bottomFrame = tk.Frame(master=windowEnhancements)
-
-    cv2.imwrite("temp.jpg", img)
-    # Below lets us add image inside Label
-    photoPath = Image.open("temp.jpg")
-    photo = ImageTk.PhotoImage(photoPath)
-
-    labelNames1 = tk.Label(
-        master = topFrame, 
-        text = "Original BW Image", 
-        compound = 'bottom',
-        width = 50,
-        bg = 'gray'
-    )
-    labelPic1 = tk.Label(
-        master = topFrame, 
-        font = ("Helvetica", 14),
-        width = photo.width(),
-        image = photo
-    )
-    labelNames2 = tk.Label()
-    labelNames3 = tk.Label(
-        master = bottomFrame, 
-        text = "New BW Image",
-        font = ("Helvetica", 14),
-        compound = 'bottom',
-        width = 50,
-        bg = 'gray'
-    )
-    labelPic2 = tk.Label()
-    labelNames4 = tk.Label()
-
-    topFrame.pack()
-    bottomFrame.pack()
-
-    labelNames1.pack()
-    labelPic1.pack(side=tk.LEFT)
-    labelNames2.pack()
-    labelNames3.pack()
-    labelPic2.pack(side=tk.LEFT)
-    labelNames4.pack()
-
-    applyEnhancements(img, windowFilename, labelPic1, labelPic2)
-
-    windowEnhancements.mainloop()
-    # kills once window is closed, to avoid multiple "exit" presses on Exit button
-    windowEnhancements.quit() 
-    # pic is created before this function - delete
-    try:
-        os.remove("temp.jpg")
-    except:
-        pass
-    
-
-###
-
 # bins are qty of histogram pieces, range is for width of graph
 def displayHist(img, imgName):
     plt.hist(img.ravel(), bins=256, range=[0,256])
-    # plt.hist(img.ravel(), 256)
-    plt.title( )
+    plt.title("B/W JPG of: " + getName(imgName))
     plt.xlabel('Gray Levels')
     plt.ylabel('Frequencies')
     plt.show()
 ###
 
-def displayHist2(img, imgName, label):
-    fig = Figure(figsize = (5, 5), dpi = 100)
-    # y = [i**2 for i in range(101)]
+def chooseEnhancement():
+    window.filename = openGUI()
+    imgGrayscale, success = getGray()
+    if (success):
+        displayHist(imgGrayscale, window.filename)
+    else:
+        tellUser("Unable to Open Enhancement Window...", labelUpdates)
 
-    # plot1 = fig.add_subplot(111)
-    # plot1.plot(y)
+# # Select an image to enhance, then prep window, then enhance
+# def chooseEnhancement():
+#     window.filename = openGUI()
+
+#     imgGrayscale, success = getGray()
+
+#     if(success):
+#         prepLayout(imgGrayscale, window.filename)
+#     else:
+#         tellUser("Unable to Open Enhancement Window...", labelUpdates)
+# ###
+
+# def prepLayout(img, windowFilename):
+#     windowEnhancements = Toplevel(window)
+#     windowEnhancements.title("Image Enhancements Below")
+#     windowEnhancements.geometry("1000x1000")
+
+#     topFrame = tk.Frame(master=windowEnhancements) 
+#     bottomFrame = tk.Frame(master=windowEnhancements)
+
+#     cv2.imwrite("temp.jpg", img)
+#     # Below lets us add image inside Label
+#     photoPath = Image.open("temp.jpg")
+#     photo = ImageTk.PhotoImage(photoPath)
+
+#     labelNames1 = tk.Label(
+#         master = topFrame, 
+#         text = "Original BW Image", 
+#         compound = 'bottom',
+#         width = 50,
+#         bg = 'gray'
+#     )
+#     labelPic1 = tk.Label(
+#         master = topFrame, 
+#         font = ("Helvetica", 14),
+#         width = photo.width(),
+#         image = photo
+#     )
+#     labelNames2 = tk.Label()
+#     labelNames3 = tk.Label(
+#         master = bottomFrame, 
+#         text = "New BW Image",
+#         font = ("Helvetica", 14),
+#         compound = 'bottom',
+#         width = 50,
+#         bg = 'gray'
+#     )
+#     labelPic2 = tk.Label()
+#     labelNames4 = tk.Label()
+
+#     topFrame.pack()
+#     bottomFrame.pack()
+
+#     labelNames1.pack()
+#     labelPic1.pack(side=tk.LEFT)
+#     labelNames2.pack()
+#     labelNames3.pack()
+#     labelPic2.pack(side=tk.LEFT)
+#     labelNames4.pack()
+
+#     applyEnhancements(img, windowFilename, labelPic1, labelPic2)
+
+#     windowEnhancements.mainloop()
+#     # kills once window is closed, to avoid multiple "exit" presses on Exit button
+#     windowEnhancements.quit() 
+#     # pic is created before this function - delete
+#     try:
+#         os.remove("temp.jpg")
+#     except:
+#         pass
+# ###
+
+# def displayHist2(img, imgName, label):
+#     fig = Figure(figsize = (5, 5), dpi = 100)
+#     # y = [i**2 for i in range(101)]
+
+#     # plot1 = fig.add_subplot(111)
+#     # plot1.plot(y)
     
 
-    canvas = FigureCanvasTkAgg(fig, master = label) 
-    toolbar = NavigationToolbar2Tk(canvas, label)
-    toolbar.update()
-    canvas.get_tk_widget().pack(side=tk.RIGHT)
+#     canvas = FigureCanvasTkAgg(fig, master = label) 
+#     toolbar = NavigationToolbar2Tk(canvas, label)
+#     toolbar.update()
+#     canvas.get_tk_widget().pack(side=tk.RIGHT)
   
-    p = fig.gca()
-    # p.title('BW Image Histogram for: ' + getName(imgName))
-    p.hist(img.ravel(), bins=256, range=[0,256])
-    p.set_xlabel('Gray Levels')
-    p.set_ylabel('Frequencies')
-    canvas.draw()
+#     p = fig.gca()
+#     # p.title('BW Image Histogram for: ' + getName(imgName))
+#     p.hist(img.ravel(), bins=256, range=[0,256])
+#     p.set_xlabel('Gray Levels')
+#     p.set_ylabel('Frequencies')
+#     canvas.draw()
 
-    canvas.draw()
-    canvas.get_tk_widget().pack(side=tk.RIGHT)
+#     canvas.draw()
+#     canvas.get_tk_widget().pack(side=tk.RIGHT)
 
-def applyEnhancements(imgGrayscale, windowFilename, labelPic1, labelPic2):
-    # TODO add buttons here for additional options - pass via GET?
+# def applyEnhancements(imgGrayscale, windowFilename, labelPic1, labelPic2):
+#     # TODO add buttons here for additional options - pass via GET?
 
-    # 1 option for now
-    displayHist2(imgGrayscale, windowFilename, labelPic1)
+#     # 1 option for now
+#     displayHist2(imgGrayscale, windowFilename, labelPic1)
 
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

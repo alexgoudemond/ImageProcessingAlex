@@ -448,14 +448,52 @@ def chooseEnhancement():
         
     else:
         tellUser("Unable to Get Grayscale Image for Enhancement Window...", labelUpdates)
+###
+
+
+def TransformationFunction(message, input, output, number):
+    plt.figure(number)
+    plt.plot(input, output)
+    plt.title(message)
+    plt.xlabel('Input Intensity Values')
+    plt.ylabel('Output Intensity Values')
+    # plt.show()
+###
 
 def executeEnhancement(intVal, img, imgName, c, gamma):
     tellUser("Opening now...", labelUpdates)
     
     if (intVal == 1):
         histEqualization(img, imgName)
-    plt.show()
-            
+    elif (intVal == 2):
+        negImage(img, imgName)
+    # elif (intVal == 3):
+        
+    # elif (intVal == 4):
+        
+    # else:
+
+    # TransformationFunction(img, imageEnhanced)
+    plt.show()       
+###
+
+def negImage(img, imgName):
+    message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
+    cv2.imshow(message, img)
+
+    message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(img, message, 1)
+
+    imageEnhanced = cv2.bitwise_not(img)
+    
+    message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(imageEnhanced, message, 2)
+
+    message = "Negative Image of: " + getName(imgName) + "." + getExtension(imgName)
+    cv2.imshow(message, imageEnhanced)
+    
+    message = "Transformation Function: "
+    TransformationFunction(message, img, imageEnhanced, 3)
 ###
 
 def histEqualization(img, imgName):
@@ -472,6 +510,7 @@ def histEqualization(img, imgName):
     
     message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
     cv2.imshow(message, imgEnhanced)
+###
 
 # # Select an image to enhance, then prep window, then enhance
 # def chooseEnhancement():

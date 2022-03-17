@@ -35,6 +35,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import filedialog
 import turtle
+from types import NoneType
 import cv2
 import numpy as np
 import os
@@ -418,7 +419,7 @@ def chooseEnhancement():
         # Open new window to choose enhancement
         choicesWindow = Toplevel(window)
         choicesWindow.title("Image Enhancements Below")
-        choicesWindow.geometry("300x200")
+        choicesWindow.geometry("300x300")
 
         enhanceOption = IntVar()
         enhanceOption.set(0)
@@ -428,15 +429,27 @@ def chooseEnhancement():
         Radiobutton(choicesWindow, text="Point Processing: Thresholding", variable=enhanceOption, value=3).pack(anchor=W)
         Radiobutton(choicesWindow, text="Logarithmic Transformations", variable=enhanceOption, value=4).pack(anchor=W)
         Radiobutton(choicesWindow, text="Power Law (Gamma) Transformations", variable=enhanceOption, value=5).pack(anchor=W)
+        cLabel = Label(choicesWindow, text="c = ...").pack()
+        cValue = tk.Entry(choicesWindow)
+        cValue.pack() #must be seperate for some reason...
+        gammaLabel = Label(choicesWindow, text="gamma = ...").pack()
+        gammaValue = tk.Entry(choicesWindow)
+        gammaValue.pack() #must be seperate for some reason...
+
+        # TODO handle NoneType issue
         Button(
             choicesWindow, text="Enhance", width=35, bg='silver',
-            command=lambda: executeEnhancement(enhanceOption.get(), img=imgGrayscale, imgName=window.filename) 
+            command=lambda: executeEnhancement(
+                                intVal=enhanceOption.get(), img=imgGrayscale, 
+                                imgName=window.filename, c=float(cValue.get() ), gamma=float(gammaValue.get() )
+                            ) 
         ).pack()
         # Button above sends the user elsewhere
+        
     else:
         tellUser("Unable to Get Grayscale Image for Enhancement Window...", labelUpdates)
 
-def executeEnhancement(intVal, img, imgName):
+def executeEnhancement(intVal, img, imgName, c, gamma):
     tellUser("Opening now...", labelUpdates)
     
     if (intVal == 1):

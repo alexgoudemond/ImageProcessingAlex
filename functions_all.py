@@ -401,12 +401,13 @@ def getAllOfMatrix(image, x, y, name):
 
 #------------------------------------------------------------------------------------Enhancement Functions Below----------------
 # bins are qty of histogram pieces, range is for width of graph
-def displayHist(img, str):
+def displayHist(img, str, number):
+    plt.figure(number) #changing the number means distinct window
     plt.hist(img.ravel(), bins=256, range=[0,256])
     plt.title(str)
     plt.xlabel('Gray Levels')
     plt.ylabel('Frequencies')
-    plt.show()
+    # plt.show()
 ###
 
 def chooseEnhancement():
@@ -440,18 +441,22 @@ def executeEnhancement(intVal, img, imgName):
     
     if (intVal == 1):
         histEqualization(img, imgName)
+    plt.show()
             
 ###
 
 def histEqualization(img, imgName):
-    message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(img, message)
+    message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
+    cv2.imshow(message, img)
 
+    message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(img, message, 1)
+    
     imgEnhanced = cv2.equalizeHist(img)
 
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(imgEnhanced, message)
-
+    displayHist(imgEnhanced, message, 2)
+    
     message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
     cv2.imshow(message, imgEnhanced)
 

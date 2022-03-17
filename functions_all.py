@@ -431,27 +431,29 @@ def chooseEnhancement():
             choicesWindow, text="Enhance", width=35, bg='silver',
             command=lambda: executeEnhancement(enhanceOption.get(), img=imgGrayscale, imgName=window.filename) 
         ).pack()
-
-
-
-        
+        # Button above sends the user elsewhere
     else:
         tellUser("Unable to Get Grayscale Image for Enhancement Window...", labelUpdates)
 
 def executeEnhancement(intVal, img, imgName):
+    tellUser("Opening now...", labelUpdates)
+    
     if (intVal == 1):
-            tellUser("Opening now...", labelUpdates)
-            # TODO All of below is Histogram Enhancement. Place in dedicated function soon
-            message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-            displayHist(img, message)
+        histEqualization(img, imgName)
+            
+###
 
-            imgEnhanced = cv2.equalizeHist(img)
+def histEqualization(img, imgName):
+    message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(img, message)
 
-            message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-            displayHist(imgEnhanced, message)
+    imgEnhanced = cv2.equalizeHist(img)
 
-            message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
-            cv2.imshow(message, imgEnhanced)
+    message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(imgEnhanced, message)
+
+    message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
+    cv2.imshow(message, imgEnhanced)
 
 # # Select an image to enhance, then prep window, then enhance
 # def chooseEnhancement():

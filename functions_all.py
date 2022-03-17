@@ -469,8 +469,8 @@ def executeEnhancement(intVal, img, imgName, c, gamma):
         negImage(img, imgName)
     elif (intVal == 3):
         thresholding(img, imgName)
-    # elif (intVal == 4):
-        
+    elif (intVal == 4):
+        logTransform(img, imgName)
     # else:
         
 
@@ -481,6 +481,23 @@ def executeEnhancement(intVal, img, imgName, c, gamma):
     displayHist(img, message, 1)
 
     plt.show()       
+###
+
+def logTransform(img, imgName):
+    cValue = 255 / np.log(1 + np.max(img))
+    imageEnhanced = cValue * np.log(1 + img) 
+    imageEnhanced.reshape(512,512)
+
+    message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(imageEnhanced, message, 2)
+
+    message = "Logarithmic Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
+    plt.figure(4)
+    plt.imshow(imageEnhanced)
+    plt.title(message)
+    
+    message = "Transformation Function: "
+    TransformationFunction(message, img, imageEnhanced, 3)
 ###
 
 def thresholding(img, imgName):

@@ -60,6 +60,7 @@ def openTheImage():
         image, success = convertRAW(window.filename)
         cv2.imshow(window.filename, image)
         cv2.waitKey(0)
+        cv2.destroyAllWindows() #Upon Keypress, close window
     else:
         success = displayImage(window.filename)
 
@@ -138,6 +139,8 @@ def convertTheImage():
     try:
         currentDir = os.getcwd()
         os.mkdir(currentDir + "\Images\Converted")
+    except FileExistsError as uhoh:
+        pass
     except Exception as uhoh:
         print("New Error:", uhoh)
         pass
@@ -423,7 +426,7 @@ def chooseEnhancement():
         ).pack()
         # Button above sends the user elsewhere
 
-        Button(choicesWindow, text="Close All Plots", bg="gray", command=lambda: plt.close('all')).pack()
+        Button(choicesWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all'), cv2.destroyAllWindows()) ).pack()
         
     else:
         tellUser("Unable to Get Grayscale Image for Enhancement Window...", labelUpdates)

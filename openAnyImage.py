@@ -6,6 +6,7 @@ Program name: openAnyImage.py
 Goal:   Open any image, using OpenCV and Tkinter
         And, Convert any image to grayscale
         And, find Matrix Intensity Values from Grayscale
+        And, apply enhancement technique using Histogram of Greyscale Image
 
 Images I can open:  JPG working
                     PNG working
@@ -34,21 +35,6 @@ Sources:
 # Notice:
             There is a lot of code in 1 place, so I have tried to structure it together. 
                 Functions are in a seperate file and grouped where possible
-            Right Now we have the following sections:
-            - Packages
-            - Functions:
-                - Open / Display
-                - Convert
-                - Changing Names
-                - Intensity values
-                - Other
-            - Program:
-                - Frames and Window
-                - Labels
-                - Buttons
-                - pack()
-                - Open
-            - End
 
 Please ensure the file functions_all.py is in the same location as this program
 Create a folder called Images in the same directory as this and place Pics

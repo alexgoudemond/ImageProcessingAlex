@@ -426,7 +426,7 @@ def chooseEnhancement():
         ).pack()
         # Button above sends the user elsewhere
 
-        Button(choicesWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all'), cv2.destroyAllWindows()) ).pack()
+        Button(choicesWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all'))).pack()
         
     else:
         tellUser("Unable to Get Grayscale Image for Enhancement Window...", labelUpdates)
@@ -436,7 +436,10 @@ def executeEnhancement(intVal, img, imgName, c, gamma):
     tellUser("Opening now...", labelUpdates)
 
     message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
-    cv2.imshow(message, img)
+    # cv2.imshow(message, img)
+    plt.figure(5)
+    plt.imshow(img, cmap='gray')
+    plt.title(message)
     
     message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
     displayHist(img, message, 1)
@@ -472,7 +475,7 @@ def gammaTransform(img, imgName, cValue, gammaValue):
 
     message = "Power law (Gamma) Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
     plt.figure(4)
-    plt.imshow(imageEnhanced)
+    plt.imshow(imageEnhanced, cmap='gray') 
     plt.title(message)
 
     message = "Transformation Function: "
@@ -489,7 +492,7 @@ def logTransform(img, imgName):
 
     message = "Logarithmic Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
     plt.figure(4)
-    plt.imshow(imageEnhanced)
+    plt.imshow(imageEnhanced, cmap='gray')
     plt.title(message)
     
     message = "Transformation Function: "
@@ -503,7 +506,10 @@ def thresholding(img, imgName):
     displayHist(imageEnhanced, message, 2)
 
     message = "Thresholding of Image: " + getName(imgName) + "." + getExtension(imgName)
-    cv2.imshow(message, imageEnhanced)
+    # cv2.imshow(message, imageEnhanced)
+    plt.figure(4)
+    plt.imshow(imageEnhanced, cmap='gray')
+    plt.title(message)
     
     message = "Transformation Function: "
     TransformationFunction(message, img, imageEnhanced, 3)
@@ -516,7 +522,10 @@ def negImage(img, imgName):
     displayHist(imageEnhanced, message, 2)
 
     message = "Negative Image of: " + getName(imgName) + "." + getExtension(imgName)
-    cv2.imshow(message, imageEnhanced)
+    # cv2.imshow(message, imageEnhanced)
+    plt.figure(4)
+    plt.imshow(imageEnhanced, cmap='gray')
+    plt.title(message)
     
     message = "Transformation Function: "
     TransformationFunction(message, img, imageEnhanced, 3)
@@ -529,7 +538,10 @@ def histEqualization(img, imgName):
     displayHist(imgEnhanced, message, 2)
     
     message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
-    cv2.imshow(message, imgEnhanced)
+    # cv2.imshow(message, imgEnhanced)
+    plt.figure(4)
+    plt.imshow(imgEnhanced, cmap='gray')
+    plt.title(message)
 
     message = "Transformation Function: "
     TransformationFunction(message, img, imgEnhanced, 3)

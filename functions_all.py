@@ -437,12 +437,10 @@ def executeEnhancement(intVal, img, imgName):
     tellUser("Opening now...", labelUpdates)
 
     # Lets us stick 5 plots in 1 window
-    fig = plt.figure(figsize=(15, 8))
+    fig = plt.figure(num="Enhancement", figsize=(15, 8))
 
     fig.add_subplot(2, 3, 1)
     message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
-    # cv2.imshow(message, img)
-    # plt.figure(5)
     plt.imshow(img, cmap='gray')
     plt.title(message)
     plt.axis('off') #Removes axes
@@ -474,11 +472,9 @@ def executeEnhancement(intVal, img, imgName):
 
         Button(textBoxWindow, text="Power Law (Gamma) Transformation", 
                 bg="silver", command=lambda: gammaTransform(img, imgName,
-                                            float(cValue.get()), float(gammaValue.get(), fig)
-                                            ) ).pack()
+                                                            float(cValue.get()), float(gammaValue.get()), fig)
+                                            ).pack()
         Button(textBoxWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all')) ).pack()
-
-        # gammaTransform(img, imgName, float(cValue.get()), float(gammaValue.get()) )      
 
     # Because second panel needed for Gamma Transform, plt.show() appears in gammaTransformation()
     if (intVal != 5):
@@ -486,29 +482,26 @@ def executeEnhancement(intVal, img, imgName):
 ###
 
 def TransformationFunction(message, input, output):
-    # plt.figure(number)
     plt.plot(input, output)
     plt.title(message)
     plt.xlabel('Input Intensity Values')
     plt.ylabel('Output Intensity Values')
-    # plt.show()
 ###
 
 def gammaTransform(img, imgName, cValue, gammaValue, fig):
     imageEnhanced = np.array(cValue*np.power(img,gammaValue))
 
-    fig.add_subplot(2, 3, 5)
+    fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
     displayHist(imageEnhanced, message, 2)
 
     fig.add_subplot(2, 3, 5)
     message = "Power law (Gamma) Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
-    # plt.figure(4)
     plt.imshow(imageEnhanced, cmap='gray') 
     plt.title(message)
     plt.axis('off') #Removes axes
 
-    fig.add_subplot(2, 3, 5)
+    fig.add_subplot(2, 3, 3)
     message = "Transformation Function: "
     TransformationFunction(message, img, imageEnhanced)
 
@@ -520,18 +513,17 @@ def logTransform(img, imgName, fig):
     imageEnhanced = cValue * np.log(1 + img) 
     imageEnhanced.reshape(512,512)
 
-    fig.add_subplot(2, 3, 5)
+    fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
     displayHist(imageEnhanced, message, 2)
 
     fig.add_subplot(2, 3, 5)
     message = "Logarithmic Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
-    # plt.figure(4)
     plt.imshow(imageEnhanced, cmap='gray')
     plt.title(message)
     plt.axis('off') #Removes axes
     
-    fig.add_subplot(2, 3, 5)
+    fig.add_subplot(2, 3, 3)
     message = "Transformation Function: "
     TransformationFunction(message, img, imageEnhanced)
 ###
@@ -545,8 +537,6 @@ def thresholding(img, imgName, fig):
 
     fig.add_subplot(2, 3, 5)
     message = "Thresholding of Image: " + getName(imgName) + "." + getExtension(imgName)
-    # cv2.imshow(message, imageEnhanced)
-    # plt.figure(4)
     plt.imshow(imageEnhanced, cmap='gray')
     plt.title(message)
     plt.axis('off') #Removes axes
@@ -566,8 +556,6 @@ def negImage(img, imgName, fig):
     
     fig.add_subplot(2, 3, 5)
     message = "Negative Image of: " + getName(imgName) + "." + getExtension(imgName)
-    # cv2.imshow(message, imageEnhanced)
-    # plt.figure(4)
     plt.imshow(imageEnhanced, cmap='gray')
     plt.title(message)
     plt.axis('off') #Removes axes
@@ -578,7 +566,6 @@ def negImage(img, imgName, fig):
 ###
 
 def histEqualization(img, imgName, fig):    
-    # fig.add_subplot(2, 3, number)
     imgEnhanced = cv2.equalizeHist(img)
 
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
@@ -586,8 +573,6 @@ def histEqualization(img, imgName, fig):
     displayHist(imgEnhanced, message, 2)
     
     message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
-    # cv2.imshow(message, imgEnhanced)
-    # plt.figure(4)
     fig.add_subplot(2, 3, 5)
     plt.imshow(imgEnhanced, cmap='gray')
     plt.title(message)
@@ -600,12 +585,10 @@ def histEqualization(img, imgName, fig):
 
 # bins are qty of histogram pieces, range is for width of graph
 def displayHist(img, str, number):
-    # plt.figure(number) #changing the number means distinct window
     plt.hist(img.ravel(), bins=256, range=[0,256])
     plt.title(str)
     plt.xlabel('Gray Levels')
     plt.ylabel('Frequencies')
-    # plt.show()
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

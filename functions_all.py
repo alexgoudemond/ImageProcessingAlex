@@ -587,6 +587,45 @@ def displayHist(img, str, number):
 
 #------------------------------------------------------------------------------------Filtering Functions Below------------------
 
+def chooseSharpeningOption():
+    window.filename = openGUI("Select an Image to Sharpen")
+    imgGrayscale, success = getGray()
+
+    if (success):
+        # Open new window to choose enhancement
+        # sharpenWindow = Toplevel(window)
+        # sharpenWindow.title("Image Sharpened Below")
+        # sharpenWindow.geometry("300x300")
+
+        figure = plt.figure(num="Sharpening", figsize=(10, 5))
+
+        executeSharpening(imgGrayscale, imgName=window.filename, fig=figure) 
+        
+    else:
+        tellUser("Unable to Get Grayscale Image for Sharpening Window...", labelUpdates)
+###
+
+def executeSharpening(imgGrayscale, imgName, fig):
+
+    # This filter is enough!
+    kernel = np.array([[0, -1, 0], 
+                   [-1, 5,-1], 
+                   [0, -1, 0]])
+
+    smoothedImage = cv2.filter2D(imgGrayscale,-1,kernel)
+
+    fig.add_subplot(1, 2, 1)
+    plt.imshow(imgGrayscale, cmap='gray')
+    plt.title('B\W of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off')
+
+    fig.add_subplot(1, 2, 2)
+    plt.imshow(smoothedImage, cmap='gray')
+    plt.title('Stencil of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off')
+
+    plt.show()
+
 def chooseSmoothingOption():
     window.filename = openGUI("Select an Image to Smooth")
     imgGrayscale, success = getGray()
@@ -678,7 +717,7 @@ def movingAverageSmooth(img, imgName, arraySize):
 ###
 
 def simpleSmooth(img, imgName, arraySize):
-    kernel = kernel = np.full((arraySize,arraySize), 1/(arraySize * arraySize)) # fills with numbers in array
+    kernel = np.full((arraySize,arraySize), 1/(arraySize * arraySize)) # fills with numbers in array
     dst = cv2.filter2D(img,-1,kernel)
     
     plt.subplot(122)

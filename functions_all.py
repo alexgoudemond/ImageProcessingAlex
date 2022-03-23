@@ -6,45 +6,30 @@ Program name: functions_all.py
 # Notice:
             There is a lot of code in 1 place, so I have tried to structure it together. Functions are grouped where possible
             Right Now we have the following sections:
-            - Packages
-            - Functions:
+            - Function Sections:
                 - Open / Display
                 - Convert
                 - Changing Names
                 - Intensity values
+                - Enhancement
                 - Other
-            - Program:
-                - Frames and Window
-                - Labels
-                - Buttons
-                - pack()
-                - Open
-            - End
 
 Please ensure the file openAnyImage.py is in the same location as this program
 """
 
 #----------------------------------------------------------------------------------------------------------------Packages Below
-# 2 objects below are global variables in my main file
-# from openAnyImage import window, labelUpdates
-
 # tkinter is GUI, numpy is for RAW images, cv2 for other videos, 
 # os for deleting files
-from json import tool
 import tkinter as tk
-from tkinter import *
-from tkinter import filedialog
-import turtle
+from tkinter import filedialog, Toplevel
+from tkinter import Radiobutton, Label, IntVar, Button, W
 import cv2
+from cv2 import destroyAllWindows
 import numpy as np
-import os
-from PIL import Image, ImageTk
+import os # Path reading, File Writing and Deleting
 from matplotlib import pyplot  as plt
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from pandas import DataFrame
 
-
+# Global Vars below
 global window 
 global updateFrame
 global labelUpdates
@@ -73,6 +58,7 @@ def openTheImage():
         image, success = convertRAW(window.filename)
         cv2.imshow(window.filename, image)
         cv2.waitKey(0)
+        cv2.destroyAllWindows() #Upon Keypress, close window
     else:
         success = displayImage(window.filename)
 
@@ -151,6 +137,8 @@ def convertTheImage():
     try:
         currentDir = os.getcwd()
         os.mkdir(currentDir + "\Images\Converted")
+    except FileExistsError as uhoh:
+        pass
     except Exception as uhoh:
         print("New Error:", uhoh)
         pass
@@ -401,119 +389,203 @@ def getAllOfMatrix(image, x, y, name):
 
 #------------------------------------------------------------------------------------Enhancement Functions Below----------------
 
-# Select an image to enhance, then prep window, then enhance
 def chooseEnhancement():
     window.filename = openGUI()
-
     imgGrayscale, success = getGray()
 
-    if(success):
-        prepLayout(imgGrayscale, window.filename)
+    if (success):
+        # Open new window to choose enhancement
+        choicesWindow = Toplevel(window)
+        choicesWindow.title("Image Enhancements Below")
+        choicesWindow.geometry("300x300")
+
+        enhanceOption = IntVar()
+        enhanceOption.set(0)
+        
+        Radiobutton(choicesWindow, text="Histogram Equalisation", variable=enhanceOption, value=1).pack(anchor=W)
+        Radiobutton(choicesWindow, text="Point Processing: Negative Image", variable=enhanceOption, value=2).pack(anchor=W)
+        Radiobutton(choicesWindow, text="Point Processing: Thresholding", variable=enhanceOption, value=3).pack(anchor=W)
+        Radiobutton(choicesWindow, text="Logarithmic Transformations", variable=enhanceOption, value=4).pack(anchor=W)
+        Radiobutton(choicesWindow, text="Power Law (Gamma) Transformations", variable=enhanceOption, value=5).pack(anchor=W)
+
+        # TODO handle NoneType issue
+        Button(
+            choicesWindow, text="Enhance", width=35, bg='silver',
+            command=lambda: executeEnhancement(
+                                intVal=enhanceOption.get(), img=imgGrayscale, 
+                                imgName=window.filename#, c=float(cValue.get() ), gamma=float(gammaValue.get() )
+                            ) 
+        ).pack()
+        # Button above sends the user elsewhere
+
+        Button(choicesWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all')) ).pack()
+        
     else:
-        tellUser("Unable to Open Enhancement Window...", labelUpdates)
+        tellUser("Unable to Get Grayscale Image for Enhancement Window...", labelUpdates)
 ###
 
-def prepLayout(img, windowFilename):
-    windowEnhancements = Toplevel(window)
-    windowEnhancements.title("Image Enhancements Below")
-    windowEnhancements.geometry("1000x1000")
+def executeEnhancement(intVal, img, imgName):
+    tellUser("Opening now...", labelUpdates)
 
-    topFrame = tk.Frame(master=windowEnhancements) 
-    bottomFrame = tk.Frame(master=windowEnhancements)
-
-    cv2.imwrite("temp.jpg", img)
-    # Below lets us add image inside Label
-    photoPath = Image.open("temp.jpg")
-    photo = ImageTk.PhotoImage(photoPath)
-
-    labelNames1 = tk.Label(
-        master = topFrame, 
-        text = "Original BW Image", 
-        compound = 'bottom',
-        width = 50,
-        bg = 'gray'
-    )
-    labelPic1 = tk.Label(
-        master = topFrame, 
-        font = ("Helvetica", 14),
-        width = photo.width(),
-        image = photo
-    )
-    labelNames2 = tk.Label()
-    labelNames3 = tk.Label(
-        master = bottomFrame, 
-        text = "New BW Image",
-        font = ("Helvetica", 14),
-        compound = 'bottom',
-        width = 50,
-        bg = 'gray'
-    )
-    labelPic2 = tk.Label()
-    labelNames4 = tk.Label()
-
-    topFrame.pack()
-    bottomFrame.pack()
-
-    labelNames1.pack()
-    labelPic1.pack(side=tk.LEFT)
-    labelNames2.pack()
-    labelNames3.pack()
-    labelPic2.pack(side=tk.LEFT)
-    labelNames4.pack()
-
-    applyEnhancements(img, windowFilename, labelPic1, labelPic2)
-
-    windowEnhancements.mainloop()
-    # kills once window is closed, to avoid multiple "exit" presses on Exit button
-    windowEnhancements.quit() 
-    # pic is created before this function - delete
-    try:
-        os.remove("temp.jpg")
-    except:
-        pass
+    # Lets us stick 5 plots in 1 window
+    fig = plt.figure(num="Enhancement", figsize=(15, 8))
     
 
+    fig.add_subplot(2, 3, 1)
+    message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
+    plt.imshow(img, cmap='gray')
+    plt.title(message)
+    plt.axis('off') #Removes axes
+    
+    fig.add_subplot(2, 3, 2)
+    message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(img, message, 1)
+
+    if (intVal == 1):
+        histEqualization(img, imgName, fig)
+    elif (intVal == 2):
+        negImage(img, imgName, fig)
+    elif (intVal == 3):
+        thresholding(img, imgName, fig)
+    elif (intVal == 4):
+        logTransform(img, imgName, fig)
+    else:
+        
+        textBoxWindow = Toplevel(window)
+        textBoxWindow.title("Image Enhancements Below")
+        textBoxWindow.geometry("300x300")
+
+        cLabel = Label(textBoxWindow, text="c = ...").pack() #used for reading
+        cValue = tk.Entry(textBoxWindow)
+        cValue.insert(0, "1.0")
+        cValue.pack() #must be seperate for some reason...
+        gammaLabel = Label(textBoxWindow, text="gamma = ...").pack() #used for reading
+        gammaValue = tk.Entry(textBoxWindow)
+        gammaValue.insert(0, "0.5")
+        gammaValue.pack() #must be seperate for some reason...
+
+        Button(textBoxWindow, text="Power Law (Gamma) Transformation", 
+                bg="silver", command=lambda: gammaTransform(img, imgName,
+                                                            float(cValue.get()), float(gammaValue.get()), fig)
+                                            ).pack()
+        Button(textBoxWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all')) ).pack()
+
+    # Because second panel needed for Gamma Transform, plt.show() appears in gammaTransformation()
+    if (intVal != 5):
+        plt.tight_layout() # Prevents title overlap in display
+        plt.show()       
 ###
 
-# bins are qty of histogram pieces, range is for width of graph
-def displayHist(img, imgName):
-    plt.hist(img.ravel(), bins=256, range=[0,256])
-    # plt.hist(img.ravel(), 256)
-    plt.title( )
-    plt.xlabel('Gray Levels')
-    plt.ylabel('Frequencies')
+def TransformationFunction(message, input, output):
+    plt.plot(input, output)
+    plt.title(message)
+    plt.xlabel('Input Intensity Values')
+    plt.ylabel('Output Intensity Values')
+###
+
+def gammaTransform(img, imgName, cValue, gammaValue, fig):
+    imageEnhanced = np.array(cValue*np.power(img,gammaValue))
+
+    fig.add_subplot(2, 3, 4)
+    message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(imageEnhanced, message, 2)
+
+    fig.add_subplot(2, 3, 5)
+    message = "Power law (Gamma) Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
+    plt.imshow(imageEnhanced, cmap='gray') 
+    plt.title(message)
+    plt.axis('off') #Removes axes
+
+    fig.add_subplot(2, 3, 3)
+    message = "Transformation Function: "
+    TransformationFunction(message, img, imageEnhanced)
+
+    plt.tight_layout() # Prevents title overlap in display
     plt.show()
 ###
 
-def displayHist2(img, imgName, label):
-    fig = Figure(figsize = (5, 5), dpi = 100)
-    # y = [i**2 for i in range(101)]
+def logTransform(img, imgName, fig):
+    cValue = 255 / np.log(1 + np.max(img))
+    imageEnhanced = cValue * np.log(1 + img) 
+    imageEnhanced.reshape(512,512)
 
-    # plot1 = fig.add_subplot(111)
-    # plot1.plot(y)
+    fig.add_subplot(2, 3, 4)
+    message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(imageEnhanced, message, 2)
+
+    fig.add_subplot(2, 3, 5)
+    message = "Logarithmic Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
+    plt.imshow(imageEnhanced, cmap='gray')
+    plt.title(message)
+    plt.axis('off') #Removes axes
     
+    fig.add_subplot(2, 3, 3)
+    message = "Transformation Function: "
+    TransformationFunction(message, img, imageEnhanced)
+###
 
-    canvas = FigureCanvasTkAgg(fig, master = label) 
-    toolbar = NavigationToolbar2Tk(canvas, label)
-    toolbar.update()
-    canvas.get_tk_widget().pack(side=tk.RIGHT)
-  
-    p = fig.gca()
-    # p.title('BW Image Histogram for: ' + getName(imgName))
-    p.hist(img.ravel(), bins=256, range=[0,256])
-    p.set_xlabel('Gray Levels')
-    p.set_ylabel('Frequencies')
-    canvas.draw()
+def thresholding(img, imgName, fig):
+    imageEnhanced = cv2.adaptiveThreshold(src=img, maxValue=255, adaptiveMethod=cv2.BORDER_REPLICATE, thresholdType=cv2.THRESH_BINARY,blockSize=3, C=10)
+    
+    fig.add_subplot(2, 3, 4)
+    message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(imageEnhanced, message, 2)
 
-    canvas.draw()
-    canvas.get_tk_widget().pack(side=tk.RIGHT)
+    fig.add_subplot(2, 3, 5)
+    message = "Thresholding of Image: " + getName(imgName) + "." + getExtension(imgName)
+    plt.imshow(imageEnhanced, cmap='gray')
+    plt.title(message)
+    plt.axis('off') #Removes axes
+    
+    fig.add_subplot(2, 3, 3)
+    message = "Transformation Function: "
+    TransformationFunction(message, img, imageEnhanced)
+###
 
-def applyEnhancements(imgGrayscale, windowFilename, labelPic1, labelPic2):
-    # TODO add buttons here for additional options - pass via GET?
+def negImage(img, imgName, fig):
+    imageEnhanced = cv2.bitwise_not(img)
+    
+    fig.add_subplot(2, 3, 4)
+    message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(imageEnhanced, message, 2)
 
-    # 1 option for now
-    displayHist2(imgGrayscale, windowFilename, labelPic1)
+    
+    fig.add_subplot(2, 3, 5)
+    message = "Negative Image of: " + getName(imgName) + "." + getExtension(imgName)
+    plt.imshow(imageEnhanced, cmap='gray')
+    plt.title(message)
+    plt.axis('off') #Removes axes
+    
+    fig.add_subplot(2, 3, 3)
+    message = "Transformation Function: "
+    TransformationFunction(message, img, imageEnhanced)
+###
 
+def histEqualization(img, imgName, fig):    
+    imgEnhanced = cv2.equalizeHist(img)
+
+    message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    fig.add_subplot(2, 3, 4)
+    displayHist(imgEnhanced, message, 2)
+    
+    message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
+    fig.add_subplot(2, 3, 5)
+    plt.imshow(imgEnhanced, cmap='gray')
+    plt.title(message)
+    plt.axis('off') #Removes axes
+
+    message = "Transformation Function: "
+    fig.add_subplot(2, 3, 3)
+    TransformationFunction(message, img, imgEnhanced)
+###
+
+# bins are qty of histogram pieces, range is for width of graph
+def displayHist(img, str, number):
+    plt.hist(img.ravel(), bins=256, range=[0,256])
+    plt.title(str)
+    plt.xlabel('Gray Levels')
+    plt.ylabel('Frequencies')
+###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 

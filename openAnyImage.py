@@ -117,16 +117,16 @@ buttonEnhance = tk.Button(
     bg = "silver",
     command = chooseEnhancement
 )
-button6 = tk.Button(
+buttonSmooth = tk.Button(
     master = buttonFrameMiddle,
-    text = "6",
+    text = "Smooth an Image",
     width = 25,
     height = 5, 
     bg = "silver",
 )
-button7 = tk.Button(
+buttonSharpen = tk.Button(
     master = buttonFrameMiddle,
-    text = "7",
+    text = "Sharpen an Image",
     width = 25,
     height = 5, 
     bg = "silver",
@@ -185,8 +185,8 @@ buttonIntensityValues.pack(side = tk.LEFT)
 buttonAllIntensityValues.pack(side = tk.RIGHT)
 
 buttonEnhance.pack(side = tk.LEFT)
-button6.pack(side = tk.LEFT)
-button7.pack(side = tk.LEFT)
+buttonSmooth.pack(side = tk.LEFT)
+buttonSharpen.pack(side = tk.LEFT)
 button8.pack(side = tk.RIGHT)
 
 button9.pack(side = tk.LEFT)

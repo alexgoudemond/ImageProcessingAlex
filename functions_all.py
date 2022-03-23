@@ -429,7 +429,6 @@ def executeEnhancement(intVal, img, imgName):
 
     # Lets us stick 5 plots in 1 window
     fig = plt.figure(num="Enhancement", figsize=(15, 8))
-    
 
     fig.add_subplot(2, 3, 1)
     message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
@@ -450,16 +449,15 @@ def executeEnhancement(intVal, img, imgName):
     elif (intVal == 4):
         logTransform(img, imgName, fig)
     else:
-        
         textBoxWindow = Toplevel(window)
         textBoxWindow.title("Image Enhancements Below")
         textBoxWindow.geometry("300x300")
 
-        cLabel = Label(textBoxWindow, text="c = ...").pack() #used for reading
+        cLabel = Label(textBoxWindow, text="c = ...").pack() #used for reading instructions
         cValue = tk.Entry(textBoxWindow)
         cValue.insert(0, "1.0")
         cValue.pack() #must be seperate for some reason...
-        gammaLabel = Label(textBoxWindow, text="gamma = ...").pack() #used for reading
+        gammaLabel = Label(textBoxWindow, text="gamma = ...").pack() #used for reading instructions
         gammaValue = tk.Entry(textBoxWindow)
         gammaValue.insert(0, "0.5")
         gammaValue.pack() #must be seperate for some reason...

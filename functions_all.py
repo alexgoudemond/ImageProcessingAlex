@@ -410,12 +410,6 @@ def chooseEnhancement():
         Radiobutton(choicesWindow, text="Point Processing: Thresholding", variable=enhanceOption, value=3).pack(anchor=W)
         Radiobutton(choicesWindow, text="Logarithmic Transformations", variable=enhanceOption, value=4).pack(anchor=W)
         Radiobutton(choicesWindow, text="Power Law (Gamma) Transformations", variable=enhanceOption, value=5).pack(anchor=W)
-        # cLabel = Label(choicesWindow, text="c = ...").pack() #used for reading
-        # cValue = tk.Entry(choicesWindow)
-        # cValue.pack() #must be seperate for some reason...
-        # gammaLabel = Label(choicesWindow, text="gamma = ...").pack() #used for reading
-        # gammaValue = tk.Entry(choicesWindow)
-        # gammaValue.pack() #must be seperate for some reason...
 
         # TODO handle NoneType issue
         Button(
@@ -466,9 +460,11 @@ def executeEnhancement(intVal, img, imgName):
 
         cLabel = Label(textBoxWindow, text="c = ...").pack() #used for reading
         cValue = tk.Entry(textBoxWindow)
+        cValue.insert(0, "1.0")
         cValue.pack() #must be seperate for some reason...
         gammaLabel = Label(textBoxWindow, text="gamma = ...").pack() #used for reading
         gammaValue = tk.Entry(textBoxWindow)
+        gammaValue.insert(0, "0.5")
         gammaValue.pack() #must be seperate for some reason...
 
         Button(textBoxWindow, text="Power Law (Gamma) Transformation", 

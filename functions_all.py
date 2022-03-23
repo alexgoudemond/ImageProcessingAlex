@@ -28,6 +28,7 @@ from cv2 import destroyAllWindows
 import numpy as np
 import os # Path reading, File Writing and Deleting
 from matplotlib import pyplot  as plt
+from pandas import array
 
 # Global Vars below
 global window 
@@ -605,10 +606,17 @@ def chooseSmoothingOption():
         Radiobutton(smoothingWindow, text="Median Smoothing", variable=enhanceOption, value=4).pack(anchor=W)
         # Radiobutton(smoothingWindow, text="Power Law (Gamma) Transformations", variable=enhanceOption, value=5).pack(anchor=W)
 
+        arrayLabel = Label(smoothingWindow, text="Array Square Size = ...").pack() #used for reading instructions
+        arrayValue = tk.Entry(smoothingWindow)
+        arrayValue.insert(0, "3")
+        arrayValue.pack() #must be seperate for some reason...
+
         Button(
             smoothingWindow, text="Smooth", width=35, bg='silver',
             command=lambda: executeSmoothing(
-                                intVal=enhanceOption.get(), img=imgGrayscale, 
+                                intVal=enhanceOption.get(), 
+                                arraySize=int(arrayValue.get()),
+                                img=imgGrayscale, 
                                 imgName=window.filename
                             ) 
         ).pack()
@@ -620,7 +628,7 @@ def chooseSmoothingOption():
         tellUser("Unable to Get Grayscale Image for Smoothing Window...", labelUpdates)
 ###
 
-def executeSmoothing(intVal, img, imgName):
+def executeSmoothing(intVal, arraySize, img, imgName):
     tellUser("Opening now...", labelUpdates)
 
     # Lets us stick 5 plots in 1 window
@@ -636,48 +644,46 @@ def executeSmoothing(intVal, img, imgName):
     fig.add_subplot(1, 2, 2)
     if (intVal == 1):
         # histEqualization(img, imgName, fig)
-        simpleSmooth(img, imgName)
+        simpleSmooth(img, imgName, arraySize)
     elif (intVal == 2):
-        movingAverageSmooth(img, imgName)
+        movingAverageSmooth(img, imgName, arraySize)
     elif (intVal == 3):
-        gaussianSmooth(img, imgName)
+        gaussianSmooth(img, imgName, arraySize)
     else:
-        medianSmooth(img, imgName)
+        medianSmooth(img, imgName, arraySize)
 
     plt.tight_layout() # Prevents title overlap in display
     plt.show()       
 ###
 
-def medianSmooth(img, imgName):
-    median = cv2.medianBlur(img,5)
+def medianSmooth(img, imgName, arraySize):
+    median = cv2.medianBlur(img,arraySize)
     plt.imshow(median, cmap='gray')
     plt.title('Gaussian Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
 ###
 
-def gaussianSmooth(img, imgName):
-    blur = cv2.GaussianBlur(img,(5,5),0)
+def gaussianSmooth(img, imgName, arraySize):
+    blur = cv2.GaussianBlur(img,(arraySize,arraySize),0)
     plt.imshow(blur, cmap='gray')
     plt.title('Gaussian Smoothof '+ getName(imgName) + "." + getExtension(imgName) )
 ###
 
-def movingAverageSmooth(img, imgName):
-    kernel = np.ones((5,5), np.float32)/25 # fills with all 1s
+def movingAverageSmooth(img, imgName, arraySize):
+    kernel = np.ones((arraySize,arraySize), np.float32)/(arraySize * arraySize) # fills with all 1s
     dst = cv2.filter2D(img,-1,kernel)
     
     plt.subplot(122)
     plt.imshow(dst, cmap='gray')
     plt.title('Moving Average Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
-
 ###
 
-def simpleSmooth(img, imgName):
-    kernel = kernel = np.full((3,3), 1/9) # fills with numbers in array
+def simpleSmooth(img, imgName, arraySize):
+    kernel = kernel = np.full((arraySize,arraySize), 1/(arraySize * arraySize)) # fills with numbers in array
     dst = cv2.filter2D(img,-1,kernel)
     
     plt.subplot(122)
     plt.imshow(dst, cmap='gray')
     plt.title('Simple Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
-
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

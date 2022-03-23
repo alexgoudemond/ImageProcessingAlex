@@ -41,7 +41,7 @@ Create a folder called Images in the same directory as this and place Pics
 """
 #----------------------------------------------------------------------------------------------------------------Packages Below
 # Encapsulating functions from our dedicated functions file
-from functions_all import chooseEnhancement, openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues
+from functions_all import chooseEnhancement, chooseSmoothingOption, openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues
 # global Vars to use
 from functions_all import window, labelUpdates, updateFrame
 
@@ -123,6 +123,7 @@ buttonSmooth = tk.Button(
     width = 25,
     height = 5, 
     bg = "silver",
+    command = chooseSmoothingOption
 )
 buttonSharpen = tk.Button(
     master = buttonFrameMiddle,

@@ -408,12 +408,11 @@ def chooseEnhancement():
         Radiobutton(choicesWindow, text="Logarithmic Transformations", variable=enhanceOption, value=4).pack(anchor=W)
         Radiobutton(choicesWindow, text="Power Law (Gamma) Transformations", variable=enhanceOption, value=5).pack(anchor=W)
 
-        # TODO handle NoneType issue
         Button(
             choicesWindow, text="Enhance", width=35, bg='silver',
             command=lambda: executeEnhancement(
                                 intVal=enhanceOption.get(), img=imgGrayscale, 
-                                imgName=window.filename#, c=float(cValue.get() ), gamma=float(gammaValue.get() )
+                                imgName=window.filename
                             ) 
         ).pack()
         # Button above sends the user elsewhere
@@ -583,6 +582,102 @@ def displayHist(img, str, number):
     plt.title(str)
     plt.xlabel('Gray Levels')
     plt.ylabel('Frequencies')
+###
+
+#------------------------------------------------------------------------------------Filtering Functions Below------------------
+
+def chooseSmoothingOption():
+    window.filename = openGUI()
+    imgGrayscale, success = getGray()
+
+    if (success):
+        # Open new window to choose enhancement
+        smoothingWindow = Toplevel(window)
+        smoothingWindow.title("Image Enhancements Below")
+        smoothingWindow.geometry("300x300")
+
+        enhanceOption = IntVar()
+        enhanceOption.set(0)
+        
+        Radiobutton(smoothingWindow, text="Simple Smoothing", variable=enhanceOption, value=1).pack(anchor=W)
+        Radiobutton(smoothingWindow, text="Moving Average Smoothing", variable=enhanceOption, value=2).pack(anchor=W)
+        Radiobutton(smoothingWindow, text="Gaussian Smoothing", variable=enhanceOption, value=3).pack(anchor=W)
+        Radiobutton(smoothingWindow, text="Median Smoothing", variable=enhanceOption, value=4).pack(anchor=W)
+        # Radiobutton(smoothingWindow, text="Power Law (Gamma) Transformations", variable=enhanceOption, value=5).pack(anchor=W)
+
+        Button(
+            smoothingWindow, text="Smooth", width=35, bg='silver',
+            command=lambda: executeSmoothing(
+                                intVal=enhanceOption.get(), img=imgGrayscale, 
+                                imgName=window.filename
+                            ) 
+        ).pack()
+        # Button above sends the user elsewhere
+
+        Button(smoothingWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all')) ).pack()
+        
+    else:
+        tellUser("Unable to Get Grayscale Image for Smoothing Window...", labelUpdates)
+###
+
+def executeSmoothing(intVal, img, imgName):
+    tellUser("Opening now...", labelUpdates)
+
+    # Lets us stick 5 plots in 1 window
+    # plt.close('Smoothing')
+    fig = plt.figure(num="Smoothing", figsize=(10, 5))
+
+    fig.add_subplot(1, 2, 1)
+    message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
+    plt.imshow(img, cmap='gray')
+    plt.title(message)
+    plt.axis('off') #Removes axes
+
+    fig.add_subplot(1, 2, 2)
+    if (intVal == 1):
+        # histEqualization(img, imgName, fig)
+        simpleSmooth(img, imgName)
+    elif (intVal == 2):
+        movingAverageSmooth(img, imgName)
+    elif (intVal == 3):
+        gaussianSmooth(img, imgName)
+    else:
+        medianSmooth(img, imgName)
+        
+    plt.tight_layout() # Prevents title overlap in display
+    plt.show()       
+###
+
+def medianSmooth(img, imgName):
+    median = cv2.medianBlur(img,5)
+    plt.imshow(median, cmap='gray')
+    plt.title('Gaussian Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+###
+
+def gaussianSmooth(img, imgName):
+    blur = cv2.GaussianBlur(img,(5,5),0)
+    plt.imshow(blur, cmap='gray')
+    plt.title('Gaussian Smoothof '+ getName(imgName) + "." + getExtension(imgName) )
+###
+
+def movingAverageSmooth(img, imgName):
+    kernel = np.ones((5,5), np.float32)/25 # fills with all 1s
+    dst = cv2.filter2D(img,-1,kernel)
+    
+    plt.subplot(122)
+    plt.imshow(dst, cmap='gray')
+    plt.title('Moving Average Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+
+###
+
+def simpleSmooth(img, imgName):
+    kernel = kernel = np.full((3,3), 1/9) # fills with numbers in array
+    dst = cv2.filter2D(img,-1,kernel)
+    
+    plt.subplot(122)
+    plt.imshow(dst, cmap='gray')
+    plt.title('Simple Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

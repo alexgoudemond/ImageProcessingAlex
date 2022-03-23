@@ -621,7 +621,7 @@ def executeSharpening(imgGrayscale, imgName, fig):
 
     fig.add_subplot(1, 2, 2)
     plt.imshow(smoothedImage, cmap='gray')
-    plt.title('Stencil of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Sharpened Image of '+ getName(imgName) + "." + getExtension(imgName) )
     plt.axis('off')
 
     plt.show()

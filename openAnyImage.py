@@ -72,6 +72,7 @@ label = tk.Label(
     compound = 'top',
     image = photo,
     width = 700,
+    height = 500,
     bg = "silver"
 )
 

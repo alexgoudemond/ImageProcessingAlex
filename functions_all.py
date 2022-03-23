@@ -50,7 +50,7 @@ labelUpdates = tk.Label(
 #----------------------------------------------------------------------------------------------------------------Functions Below
 #------------------------------------------------------------------------------------Open / Display Functions-------------------
 def openTheImage():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to Open")
 
     if window.filename.endswith(".gif"):
         success = displayGIF(window.filename)
@@ -132,7 +132,7 @@ def getGray():
 
 # responsible for converting any image, then saving as grayscale jpg in dedicated folder
 def convertTheImage():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to Convert")
 
     try:
         currentDir = os.getcwd()
@@ -273,7 +273,7 @@ def getExtension(imgName):
 # First - convert to B&W, then get Intensity Values
 # ! Note - Only considers first frame in GIF Array. Can extend Later
 def getBWIntensityValues():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to get B\W Intensity Values")
 
     imgGrayscale, success = getGray()
     (x, y) = imgGrayscale.shape
@@ -339,7 +339,7 @@ def getPartOfMatrix(image, x, y, name):
 ###
 
 def downloadBWIntensityValues():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to Download Intensity Values")
 
     imgGrayscale, success = getGray()
     (x, y) = imgGrayscale.shape
@@ -390,7 +390,7 @@ def getAllOfMatrix(image, x, y, name):
 #------------------------------------------------------------------------------------Enhancement Functions Below----------------
 
 def chooseEnhancement():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to Enhance")
     imgGrayscale, success = getGray()
 
     if (success):
@@ -587,7 +587,7 @@ def displayHist(img, str, number):
 #------------------------------------------------------------------------------------Filtering Functions Below------------------
 
 def chooseSmoothingOption():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to Smooth")
     imgGrayscale, success = getGray()
 
     if (success):
@@ -643,7 +643,7 @@ def executeSmoothing(intVal, img, imgName):
         gaussianSmooth(img, imgName)
     else:
         medianSmooth(img, imgName)
-        
+
     plt.tight_layout() # Prevents title overlap in display
     plt.show()       
 ###
@@ -694,8 +694,8 @@ def tellUser(str, label):
     label.config(text = newText) #global var
 ###
 
-def openGUI():
-    temp = filedialog.askopenfilename(initialdir="Images", title="Select an Image to Open", 
+def openGUI(message):
+    temp = filedialog.askopenfilename(initialdir="Images", title=message, 
                                                     filetypes=(
                                                         ("All Files", "*.*"), ("jpg Files", "*.jpg"), 
                                                         ("png files", "*.png"), ("gif files", "*.gif"),

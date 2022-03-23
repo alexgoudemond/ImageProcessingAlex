@@ -27,6 +27,7 @@ import tkinter as tk
 from tkinter import filedialog, Toplevel
 from tkinter import Radiobutton, Label, IntVar, Button, W
 import cv2
+from cv2 import destroyAllWindows
 import numpy as np
 import os # Path reading, File Writing and Deleting
 from matplotlib import pyplot  as plt
@@ -409,40 +410,31 @@ def chooseEnhancement():
         Radiobutton(choicesWindow, text="Point Processing: Thresholding", variable=enhanceOption, value=3).pack(anchor=W)
         Radiobutton(choicesWindow, text="Logarithmic Transformations", variable=enhanceOption, value=4).pack(anchor=W)
         Radiobutton(choicesWindow, text="Power Law (Gamma) Transformations", variable=enhanceOption, value=5).pack(anchor=W)
-        cLabel = Label(choicesWindow, text="c = ...").pack() #used for reading
-        cValue = tk.Entry(choicesWindow)
-        cValue.pack() #must be seperate for some reason...
-        gammaLabel = Label(choicesWindow, text="gamma = ...").pack() #used for reading
-        gammaValue = tk.Entry(choicesWindow)
-        gammaValue.pack() #must be seperate for some reason...
+        # cLabel = Label(choicesWindow, text="c = ...").pack() #used for reading
+        # cValue = tk.Entry(choicesWindow)
+        # cValue.pack() #must be seperate for some reason...
+        # gammaLabel = Label(choicesWindow, text="gamma = ...").pack() #used for reading
+        # gammaValue = tk.Entry(choicesWindow)
+        # gammaValue.pack() #must be seperate for some reason...
 
         # TODO handle NoneType issue
         Button(
             choicesWindow, text="Enhance", width=35, bg='silver',
             command=lambda: executeEnhancement(
                                 intVal=enhanceOption.get(), img=imgGrayscale, 
-                                imgName=window.filename, c=float(cValue.get() ), gamma=float(gammaValue.get() )
+                                imgName=window.filename#, c=float(cValue.get() ), gamma=float(gammaValue.get() )
                             ) 
         ).pack()
         # Button above sends the user elsewhere
 
-        Button(choicesWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all'))).pack()
+        Button(choicesWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all')) ).pack()
         
     else:
         tellUser("Unable to Get Grayscale Image for Enhancement Window...", labelUpdates)
 ###
 
-def executeEnhancement(intVal, img, imgName, c, gamma):
+def executeEnhancement(intVal, img, imgName):
     tellUser("Opening now...", labelUpdates)
-
-    message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
-    # cv2.imshow(message, img)
-    plt.figure(5)
-    plt.imshow(img, cmap='gray')
-    plt.title(message)
-    
-    message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(img, message, 1)
 
     if (intVal == 1):
         histEqualization(img, imgName)
@@ -453,9 +445,38 @@ def executeEnhancement(intVal, img, imgName, c, gamma):
     elif (intVal == 4):
         logTransform(img, imgName)
     else:
-        gammaTransform(img, imgName, c, gamma)        
+        
+        textBoxWindow = Toplevel(window)
+        textBoxWindow.title("Image Enhancements Below")
+        textBoxWindow.geometry("300x300")
 
-    plt.show()       
+        cLabel = Label(textBoxWindow, text="c = ...").pack() #used for reading
+        cValue = tk.Entry(textBoxWindow)
+        cValue.pack() #must be seperate for some reason...
+        gammaLabel = Label(textBoxWindow, text="gamma = ...").pack() #used for reading
+        gammaValue = tk.Entry(textBoxWindow)
+        gammaValue.pack() #must be seperate for some reason...
+
+        Button(textBoxWindow, text="Power Law (Gamma) Transformation", 
+                bg="silver", command=lambda: gammaTransform(img, imgName,
+                                            float(cValue.get()), float(gammaValue.get())
+                                            ) ).pack()
+        Button(textBoxWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all')) ).pack()
+
+        # gammaTransform(img, imgName, float(cValue.get()), float(gammaValue.get()) )      
+      
+    message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
+    # cv2.imshow(message, img)
+    plt.figure(5)
+    plt.imshow(img, cmap='gray')
+    plt.title(message)
+    
+    message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
+    displayHist(img, message, 1)
+
+    # Because second panel needed for Gamma Transform, plt.show() appears in gammaTransformation()
+    if (intVal != 5):
+        plt.show()       
 ###
 
 def TransformationFunction(message, input, output, number):
@@ -480,6 +501,8 @@ def gammaTransform(img, imgName, cValue, gammaValue):
 
     message = "Transformation Function: "
     TransformationFunction(message, img, imageEnhanced, 3)
+
+    plt.show()
 ###
 
 def logTransform(img, imgName):

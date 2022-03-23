@@ -18,9 +18,6 @@ Please ensure the file openAnyImage.py is in the same location as this program
 """
 
 #----------------------------------------------------------------------------------------------------------------Packages Below
-# 2 objects below are global variables in my main file
-# from openAnyImage import window, labelUpdates
-
 # tkinter is GUI, numpy is for RAW images, cv2 for other videos, 
 # os for deleting files
 import tkinter as tk
@@ -32,7 +29,7 @@ import numpy as np
 import os # Path reading, File Writing and Deleting
 from matplotlib import pyplot  as plt
 
-
+# Global Vars below
 global window 
 global updateFrame
 global labelUpdates

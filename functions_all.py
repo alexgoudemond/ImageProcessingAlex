@@ -438,6 +438,7 @@ def executeEnhancement(intVal, img, imgName):
 
     # Lets us stick 5 plots in 1 window
     fig = plt.figure(num="Enhancement", figsize=(15, 8))
+    
 
     fig.add_subplot(2, 3, 1)
     message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
@@ -478,6 +479,7 @@ def executeEnhancement(intVal, img, imgName):
 
     # Because second panel needed for Gamma Transform, plt.show() appears in gammaTransformation()
     if (intVal != 5):
+        plt.tight_layout() # Prevents title overlap in display
         plt.show()       
 ###
 
@@ -505,6 +507,7 @@ def gammaTransform(img, imgName, cValue, gammaValue, fig):
     message = "Transformation Function: "
     TransformationFunction(message, img, imageEnhanced)
 
+    plt.tight_layout() # Prevents title overlap in display
     plt.show()
 ###
 

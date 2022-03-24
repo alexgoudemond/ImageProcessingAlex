@@ -486,7 +486,7 @@ def gammaTransform(img, imgName, cValue, gammaValue, fig):
 
     fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(imageEnhanced, message, 2)
+    displayHist(imageEnhanced, message)
 
     fig.add_subplot(2, 3, 5)
     message = "Power law (Gamma) Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
@@ -509,7 +509,7 @@ def logTransform(img, imgName, fig):
 
     fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(imageEnhanced, message, 2)
+    displayHist(imageEnhanced, message)
 
     fig.add_subplot(2, 3, 5)
     message = "Logarithmic Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
@@ -527,7 +527,7 @@ def thresholding(img, imgName, fig):
     
     fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(imageEnhanced, message, 2)
+    displayHist(imageEnhanced, message)
 
     fig.add_subplot(2, 3, 5)
     message = "Thresholding of Image: " + getName(imgName) + "." + getExtension(imgName)
@@ -545,7 +545,7 @@ def negImage(img, imgName, fig):
     
     fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(imageEnhanced, message, 2)
+    displayHist(imageEnhanced, message)
 
     
     fig.add_subplot(2, 3, 5)
@@ -564,7 +564,7 @@ def histEqualization(img, imgName, fig):
 
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
     fig.add_subplot(2, 3, 4)
-    displayHist(imgEnhanced, message, 2)
+    displayHist(imgEnhanced, message)
     
     message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
     fig.add_subplot(2, 3, 5)
@@ -578,7 +578,7 @@ def histEqualization(img, imgName, fig):
 ###
 
 # bins are qty of histogram pieces, range is for width of graph
-def displayHist(img, str, number):
+def displayHist(img, str):
     plt.hist(img.ravel(), bins=256, range=[0,256])
     plt.title(str)
     plt.xlabel('Gray Levels')

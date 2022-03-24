@@ -607,11 +607,25 @@ def chooseSharpeningOption():
 def executeSharpening(imgGrayscale, imgName, fig):
 
     # This filter is enough!
-    kernel = np.array([[0, -1, 0], 
-                   [-1, 5,-1], 
-                   [0, -1, 0]])
+    kernel = np.array([ [0, -1, 0], 
+                        [-1, 5, -1], 
+                        [0, -1, 0] ])
+    # kernel = np.array([ [-1, -1, -1], 
+    #                     [-1,  9, -1], 
+    #                     [-1, -1, -1] ])
 
-    smoothedImage = cv2.filter2D(imgGrayscale,-1,kernel)
+    blur = cv2.GaussianBlur(imgGrayscale,(5, 5),0)
+    # blur = cv2.medianBlur(imgGrayscale,3)
+    # blur = cv2.filter2D(imgGrayscale,-1,kernel)
+    edgesOnly = imgGrayscale - blur
+    smoothedImage = imgGrayscale + edgesOnly
+
+    (x, y) = imgGrayscale.shape
+    print(getPartOfMatrix(imgGrayscale, x, y,  "Grayscale Img"))
+    (x, y) = blur.shape
+    print(getPartOfMatrix(blur, x, y,  "Blur Img"))
+    (x, y) = smoothedImage.shape
+    print(getPartOfMatrix(smoothedImage, x, y,  "smooth Img"))
 
     fig.add_subplot(1, 2, 1)
     plt.imshow(imgGrayscale, cmap='gray')
@@ -669,8 +683,6 @@ def chooseSmoothingOption():
 def executeSmoothing(intVal, arraySize, img, imgName):
     tellUser("Opening now...", labelUpdates)
 
-    # Lets us stick 5 plots in 1 window
-    # plt.close('Smoothing')
     fig = plt.figure(num="Smoothing", figsize=(10, 5))
     plt.clf() # Should clear last plot but keep window open? 
 

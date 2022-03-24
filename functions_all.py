@@ -620,12 +620,12 @@ def executeSharpening(imgGrayscale, imgName, fig):
     edgesOnly = imgGrayscale - blur
     smoothedImage = imgGrayscale + edgesOnly
 
-    (x, y) = imgGrayscale.shape
-    print(getPartOfMatrix(imgGrayscale, x, y,  "Grayscale Img"))
-    (x, y) = blur.shape
-    print(getPartOfMatrix(blur, x, y,  "Blur Img"))
-    (x, y) = smoothedImage.shape
-    print(getPartOfMatrix(smoothedImage, x, y,  "smooth Img"))
+    # (x, y) = imgGrayscale.shape
+    # print(getPartOfMatrix(imgGrayscale, x, y,  "Grayscale Img"))
+    # (x, y) = blur.shape
+    # print(getPartOfMatrix(blur, x, y,  "Blur Img"))
+    # (x, y) = smoothedImage.shape
+    # print(getPartOfMatrix(smoothedImage, x, y,  "smooth Img"))
 
     fig.add_subplot(1, 2, 1)
     plt.imshow(imgGrayscale, cmap='gray')
@@ -637,6 +637,7 @@ def executeSharpening(imgGrayscale, imgName, fig):
     plt.title('Sharpened Image of '+ getName(imgName) + "." + getExtension(imgName) )
     plt.axis('off')
 
+    plt.tight_layout() # Prevents title overlap in display
     plt.show()
 
 def chooseSmoothingOption():
@@ -711,12 +712,14 @@ def medianSmooth(img, imgName, arraySize):
     median = cv2.medianBlur(img,arraySize)
     plt.imshow(median, cmap='gray')
     plt.title('Gaussian Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off') #Removes axes
 ###
 
 def gaussianSmooth(img, imgName, arraySize):
     blur = cv2.GaussianBlur(img,(arraySize,arraySize),0)
     plt.imshow(blur, cmap='gray')
     plt.title('Gaussian Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off') #Removes axes
 ###
 
 def movingAverageSmooth(img, imgName, arraySize):
@@ -726,6 +729,7 @@ def movingAverageSmooth(img, imgName, arraySize):
     plt.subplot(122)
     plt.imshow(dst, cmap='gray')
     plt.title('Moving Average Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off') #Removes axes
 ###
 
 def simpleSmooth(img, imgName, arraySize):
@@ -735,6 +739,7 @@ def simpleSmooth(img, imgName, arraySize):
     plt.subplot(122)
     plt.imshow(dst, cmap='gray')
     plt.title('Simple Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off') #Removes axes
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

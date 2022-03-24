@@ -629,12 +629,12 @@ def executeSharpening(imgGrayscale, imgName, fig):
 
     fig.add_subplot(1, 2, 1)
     plt.imshow(imgGrayscale, cmap='gray')
-    plt.title('B\W of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('B\W JPG Image of: '+ getName(imgName) + "." + getExtension(imgName) )
     plt.axis('off')
 
     fig.add_subplot(1, 2, 2)
     plt.imshow(smoothedImage, cmap='gray')
-    plt.title('Sharpened Image of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Sharpened Image of: '+ getName(imgName) + "." + getExtension(imgName) )
     plt.axis('off')
 
     plt.tight_layout() # Prevents title overlap in display
@@ -688,7 +688,7 @@ def executeSmoothing(intVal, arraySize, img, imgName):
     plt.clf() # Should clear last plot but keep window open? 
 
     fig.add_subplot(1, 2, 1)
-    message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
+    message = "B\W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
     plt.imshow(img, cmap='gray')
     plt.title(message)
     plt.axis('off') #Removes axes

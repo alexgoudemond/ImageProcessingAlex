@@ -24,11 +24,9 @@ import tkinter as tk
 from tkinter import filedialog, Toplevel
 from tkinter import Radiobutton, Label, IntVar, Button, W
 import cv2
-from cv2 import destroyAllWindows
 import numpy as np
 import os # Path reading, File Writing and Deleting
 from matplotlib import pyplot  as plt
-from pandas import array
 
 # Global Vars below
 global window 
@@ -429,6 +427,7 @@ def executeEnhancement(intVal, img, imgName):
 
     # Lets us stick 5 plots in 1 window
     fig = plt.figure(num="Enhancement", figsize=(15, 8))
+    plt.clf() # Should clear last plot but keep window open? 
 
     fig.add_subplot(2, 3, 1)
     message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
@@ -438,7 +437,7 @@ def executeEnhancement(intVal, img, imgName):
     
     fig.add_subplot(2, 3, 2)
     message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(img, message, 1)
+    displayHist(img, message)
 
     if (intVal == 1):
         histEqualization(img, imgName, fig)
@@ -673,6 +672,7 @@ def executeSmoothing(intVal, arraySize, img, imgName):
     # Lets us stick 5 plots in 1 window
     # plt.close('Smoothing')
     fig = plt.figure(num="Smoothing", figsize=(10, 5))
+    plt.clf() # Should clear last plot but keep window open? 
 
     fig.add_subplot(1, 2, 1)
     message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
@@ -692,7 +692,7 @@ def executeSmoothing(intVal, arraySize, img, imgName):
         medianSmooth(img, imgName, arraySize)
 
     plt.tight_layout() # Prevents title overlap in display
-    plt.show()       
+    plt.show()   
 ###
 
 def medianSmooth(img, imgName, arraySize):
@@ -704,7 +704,7 @@ def medianSmooth(img, imgName, arraySize):
 def gaussianSmooth(img, imgName, arraySize):
     blur = cv2.GaussianBlur(img,(arraySize,arraySize),0)
     plt.imshow(blur, cmap='gray')
-    plt.title('Gaussian Smoothof '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Gaussian Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
 ###
 
 def movingAverageSmooth(img, imgName, arraySize):

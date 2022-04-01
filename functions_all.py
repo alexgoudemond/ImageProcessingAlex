@@ -627,12 +627,17 @@ def executeSharpening(imgGrayscale, imgName, fig):
     # (x, y) = smoothedImage.shape
     # print(getPartOfMatrix(smoothedImage, x, y,  "smooth Img"))
 
-    fig.add_subplot(1, 2, 1)
+    fig.add_subplot(1, 3, 1)
     plt.imshow(imgGrayscale, cmap='gray')
-    plt.title('B\W JPG Image of: '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('B\W Image of: '+ getName(imgName) + "." + getExtension(imgName) )
     plt.axis('off')
 
-    fig.add_subplot(1, 2, 2)
+    fig.add_subplot(1, 3, 2)
+    plt.imshow(edgesOnly, cmap='gray')
+    plt.title('Edges of: '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off')
+
+    fig.add_subplot(1, 3, 3)
     plt.imshow(smoothedImage, cmap='gray')
     plt.title('Sharpened Image of: '+ getName(imgName) + "." + getExtension(imgName) )
     plt.axis('off')

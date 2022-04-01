@@ -716,7 +716,7 @@ def executeSmoothing(intVal, arraySize, img, imgName):
 def medianSmooth(img, imgName, arraySize):
     median = cv2.medianBlur(img,arraySize)
     plt.imshow(median, cmap='gray')
-    plt.title('Gaussian Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Median Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
     plt.axis('off') #Removes axes
 ###
 

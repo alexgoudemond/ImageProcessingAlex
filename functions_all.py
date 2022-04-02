@@ -129,8 +129,7 @@ def getGray():
     return imgGrayscale, success
 ###
 
-# responsible for converting any image, then saving as grayscale jpg in dedicated folder
-def convertTheImage():
+def imgToGrayscale(convertWindow):
     window.filename = openGUI("Select an Image to Convert")
 
     try:
@@ -155,6 +154,35 @@ def convertTheImage():
         tellUser("Image converted successfully", labelUpdates)
     else:
         tellUser("Something went wrong... Unable to open")
+###
+
+def imgToBinary(window):
+    return True
+
+# responsible for converting any image, then saving as grayscale jpg in dedicated folder
+def convertTheImage():
+    # open new window - choose Grayscale or Binary
+    convertWindow = Toplevel(window)
+    convertWindow.title("What kind of conversion...")
+    convertWindow.geometry("300x300")
+
+    enhanceOption = IntVar()
+    enhanceOption.set(0)
+
+    Radiobutton(convertWindow, text="Grayscale Conversion", variable=enhanceOption, value=1).pack(anchor=W)
+    Radiobutton(convertWindow, text="Binary Conversion", variable=enhanceOption, value=2).pack(anchor=W)
+
+    Button(convertWindow, text="convert", width=35, bg='silver',
+            command=lambda: executeConversion(intVal=enhanceOption.get(), window=convertWindow ) 
+        ).pack()
+###
+
+def executeConversion(intVal, window):
+    # grayscale
+    if (intVal == 1):
+        imgToGrayscale(window)
+    else:
+        imgToBinary(window)
 ###
 
 def convertOtherImages(imgName):

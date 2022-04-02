@@ -821,6 +821,11 @@ def simpleSmooth(img, imgName, arraySize):
     plt.axis('off') #Removes axes
 ###
 
+#------------------------------------------------------------------------------------Morphological Functions Below--------------
+
+def chooseMorphologyOption():
+    return True
+
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 
 # places updated label for user

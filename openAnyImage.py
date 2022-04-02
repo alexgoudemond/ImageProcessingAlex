@@ -41,7 +41,8 @@ Create a folder called Images in the same directory as this and place Pics
 """
 #----------------------------------------------------------------------------------------------------------------Packages Below
 # Encapsulating functions from our dedicated functions file
-from functions_all import chooseEnhancement, chooseSharpeningOption, chooseSmoothingOption, openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues
+from functions_all import   (chooseEnhancement, chooseMorphologyOption, chooseSharpeningOption, chooseSmoothingOption, 
+                            openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues)
 # global Vars to use
 from functions_all import window, labelUpdates, updateFrame
 
@@ -139,7 +140,8 @@ buttonMorphology = tk.Button(
     text = "Alter Image Shape (Morphology)",
     width = 25,
     height = 5, 
-    bg = "silver"
+    bg = "silver",
+    command = chooseMorphologyOption
 )
 button9 = tk.Button(
     master = buttonFrameBottom,

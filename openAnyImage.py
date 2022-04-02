@@ -41,7 +41,7 @@ Create a folder called Images in the same directory as this and place Pics
 """
 #----------------------------------------------------------------------------------------------------------------Packages Below
 # Encapsulating functions from our dedicated functions file
-from functions_all import chooseEnhancement, openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues
+from functions_all import chooseEnhancement, chooseSharpeningOption, chooseSmoothingOption, openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues
 # global Vars to use
 from functions_all import window, labelUpdates, updateFrame
 
@@ -72,6 +72,7 @@ label = tk.Label(
     compound = 'top',
     image = photo,
     width = 700,
+    height = 500,
     bg = "silver"
 )
 
@@ -117,19 +118,21 @@ buttonEnhance = tk.Button(
     bg = "silver",
     command = chooseEnhancement
 )
-button6 = tk.Button(
+buttonSmooth = tk.Button(
     master = buttonFrameMiddle,
-    text = "6",
+    text = "Smooth an Image",
     width = 25,
     height = 5, 
     bg = "silver",
+    command = chooseSmoothingOption
 )
-button7 = tk.Button(
+buttonSharpen = tk.Button(
     master = buttonFrameMiddle,
-    text = "7",
+    text = "Sharpen an Image",
     width = 25,
     height = 5, 
     bg = "silver",
+    command = chooseSharpeningOption
 )
 button8 = tk.Button(
     master = buttonFrameMiddle,
@@ -185,8 +188,8 @@ buttonIntensityValues.pack(side = tk.LEFT)
 buttonAllIntensityValues.pack(side = tk.RIGHT)
 
 buttonEnhance.pack(side = tk.LEFT)
-button6.pack(side = tk.LEFT)
-button7.pack(side = tk.LEFT)
+buttonSmooth.pack(side = tk.LEFT)
+buttonSharpen.pack(side = tk.LEFT)
 button8.pack(side = tk.RIGHT)
 
 button9.pack(side = tk.LEFT)

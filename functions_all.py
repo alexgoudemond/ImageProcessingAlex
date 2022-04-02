@@ -24,7 +24,6 @@ import tkinter as tk
 from tkinter import filedialog, Toplevel
 from tkinter import Radiobutton, Label, IntVar, Button, W
 import cv2
-from cv2 import destroyAllWindows
 import numpy as np
 import os # Path reading, File Writing and Deleting
 from matplotlib import pyplot  as plt
@@ -50,7 +49,7 @@ labelUpdates = tk.Label(
 #----------------------------------------------------------------------------------------------------------------Functions Below
 #------------------------------------------------------------------------------------Open / Display Functions-------------------
 def openTheImage():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to Open")
 
     if window.filename.endswith(".gif"):
         success = displayGIF(window.filename)
@@ -132,7 +131,7 @@ def getGray():
 
 # responsible for converting any image, then saving as grayscale jpg in dedicated folder
 def convertTheImage():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to Convert")
 
     try:
         currentDir = os.getcwd()
@@ -273,7 +272,7 @@ def getExtension(imgName):
 # First - convert to B&W, then get Intensity Values
 # ! Note - Only considers first frame in GIF Array. Can extend Later
 def getBWIntensityValues():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to get B\W Intensity Values")
 
     imgGrayscale, success = getGray()
     (x, y) = imgGrayscale.shape
@@ -339,7 +338,7 @@ def getPartOfMatrix(image, x, y, name):
 ###
 
 def downloadBWIntensityValues():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to Download Intensity Values")
 
     imgGrayscale, success = getGray()
     (x, y) = imgGrayscale.shape
@@ -390,7 +389,7 @@ def getAllOfMatrix(image, x, y, name):
 #------------------------------------------------------------------------------------Enhancement Functions Below----------------
 
 def chooseEnhancement():
-    window.filename = openGUI()
+    window.filename = openGUI("Select an Image to Enhance")
     imgGrayscale, success = getGray()
 
     if (success):
@@ -408,12 +407,11 @@ def chooseEnhancement():
         Radiobutton(choicesWindow, text="Logarithmic Transformations", variable=enhanceOption, value=4).pack(anchor=W)
         Radiobutton(choicesWindow, text="Power Law (Gamma) Transformations", variable=enhanceOption, value=5).pack(anchor=W)
 
-        # TODO handle NoneType issue
         Button(
             choicesWindow, text="Enhance", width=35, bg='silver',
             command=lambda: executeEnhancement(
                                 intVal=enhanceOption.get(), img=imgGrayscale, 
-                                imgName=window.filename#, c=float(cValue.get() ), gamma=float(gammaValue.get() )
+                                imgName=window.filename
                             ) 
         ).pack()
         # Button above sends the user elsewhere
@@ -429,7 +427,7 @@ def executeEnhancement(intVal, img, imgName):
 
     # Lets us stick 5 plots in 1 window
     fig = plt.figure(num="Enhancement", figsize=(15, 8))
-    
+    plt.clf() # Should clear last plot but keep window open? 
 
     fig.add_subplot(2, 3, 1)
     message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
@@ -439,7 +437,7 @@ def executeEnhancement(intVal, img, imgName):
     
     fig.add_subplot(2, 3, 2)
     message = "Histogram of B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(img, message, 1)
+    displayHist(img, message)
 
     if (intVal == 1):
         histEqualization(img, imgName, fig)
@@ -450,16 +448,15 @@ def executeEnhancement(intVal, img, imgName):
     elif (intVal == 4):
         logTransform(img, imgName, fig)
     else:
-        
         textBoxWindow = Toplevel(window)
         textBoxWindow.title("Image Enhancements Below")
         textBoxWindow.geometry("300x300")
 
-        cLabel = Label(textBoxWindow, text="c = ...").pack() #used for reading
+        cLabel = Label(textBoxWindow, text="c = ...").pack() #used for reading instructions
         cValue = tk.Entry(textBoxWindow)
         cValue.insert(0, "1.0")
         cValue.pack() #must be seperate for some reason...
-        gammaLabel = Label(textBoxWindow, text="gamma = ...").pack() #used for reading
+        gammaLabel = Label(textBoxWindow, text="gamma = ...").pack() #used for reading instructions
         gammaValue = tk.Entry(textBoxWindow)
         gammaValue.insert(0, "0.5")
         gammaValue.pack() #must be seperate for some reason...
@@ -488,10 +485,10 @@ def gammaTransform(img, imgName, cValue, gammaValue, fig):
 
     fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(imageEnhanced, message, 2)
+    displayHist(imageEnhanced, message)
 
     fig.add_subplot(2, 3, 5)
-    message = "Power law (Gamma) Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
+    message = "Gamma Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
     plt.imshow(imageEnhanced, cmap='gray') 
     plt.title(message)
     plt.axis('off') #Removes axes
@@ -507,11 +504,11 @@ def gammaTransform(img, imgName, cValue, gammaValue, fig):
 def logTransform(img, imgName, fig):
     cValue = 255 / np.log(1 + np.max(img))
     imageEnhanced = cValue * np.log(1 + img) 
-    imageEnhanced.reshape(512,512)
+    # imageEnhanced.reshape(512,512)
 
     fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(imageEnhanced, message, 2)
+    displayHist(imageEnhanced, message)
 
     fig.add_subplot(2, 3, 5)
     message = "Logarithmic Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
@@ -529,7 +526,7 @@ def thresholding(img, imgName, fig):
     
     fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(imageEnhanced, message, 2)
+    displayHist(imageEnhanced, message)
 
     fig.add_subplot(2, 3, 5)
     message = "Thresholding of Image: " + getName(imgName) + "." + getExtension(imgName)
@@ -547,7 +544,7 @@ def negImage(img, imgName, fig):
     
     fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
-    displayHist(imageEnhanced, message, 2)
+    displayHist(imageEnhanced, message)
 
     
     fig.add_subplot(2, 3, 5)
@@ -566,7 +563,7 @@ def histEqualization(img, imgName, fig):
 
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
     fig.add_subplot(2, 3, 4)
-    displayHist(imgEnhanced, message, 2)
+    displayHist(imgEnhanced, message)
     
     message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
     fig.add_subplot(2, 3, 5)
@@ -580,11 +577,163 @@ def histEqualization(img, imgName, fig):
 ###
 
 # bins are qty of histogram pieces, range is for width of graph
-def displayHist(img, str, number):
+def displayHist(img, str):
     plt.hist(img.ravel(), bins=256, range=[0,256])
     plt.title(str)
     plt.xlabel('Gray Levels')
     plt.ylabel('Frequencies')
+###
+
+#------------------------------------------------------------------------------------Filtering Functions Below------------------
+
+def chooseSharpeningOption():
+    window.filename = openGUI("Select an Image to Sharpen")
+    imgGrayscale, success = getGray()
+
+    if (success):
+        # Open new window to choose enhancement
+        # sharpenWindow = Toplevel(window)
+        # sharpenWindow.title("Image Sharpened Below")
+        # sharpenWindow.geometry("300x300")
+
+        figure = plt.figure(num="Sharpening", figsize=(10, 5))
+
+        executeSharpening(imgGrayscale, imgName=window.filename, fig=figure) 
+        
+    else:
+        tellUser("Unable to Get Grayscale Image for Sharpening Window...", labelUpdates)
+###
+
+def executeSharpening(imgGrayscale, imgName, fig):
+    # This filter is enough!
+    # kernel = np.array([ [0, -1, 0], 
+    #                     [-1, 5, -1], 
+    #                     [0, -1, 0] ])
+    # blur = cv2.filter2D(imgGrayscale,-1,kernel)
+    
+    blur = cv2.medianBlur(imgGrayscale, 3)
+    edgesOnly = imgGrayscale - blur
+    sharpenedImage = imgGrayscale + edgesOnly
+
+    fig.add_subplot(1, 3, 1)
+    plt.imshow(imgGrayscale, cmap='gray')
+    plt.title('B\W Image of: '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off')
+
+    fig.add_subplot(1, 3, 2)
+    plt.imshow(edgesOnly, cmap='gray')
+    plt.title('Edges of: '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off')
+
+    fig.add_subplot(1, 3, 3)
+    plt.imshow(sharpenedImage, cmap='gray')
+    plt.title('Sharpened Image of: '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off')
+
+    plt.tight_layout() # Prevents title overlap in display
+    plt.show()
+###
+
+def chooseSmoothingOption():
+    window.filename = openGUI("Select an Image to Smooth")
+    imgGrayscale, success = getGray()
+
+    if (success):
+        # Open new window to choose enhancement
+        smoothingWindow = Toplevel(window)
+        smoothingWindow.title("Image Enhancements Below")
+        smoothingWindow.geometry("300x300")
+
+        enhanceOption = IntVar()
+        enhanceOption.set(0)
+        
+        Radiobutton(smoothingWindow, text="Simple Smoothing", variable=enhanceOption, value=1).pack(anchor=W)
+        Radiobutton(smoothingWindow, text="Moving Average Smoothing", variable=enhanceOption, value=2).pack(anchor=W)
+        Radiobutton(smoothingWindow, text="Gaussian Smoothing", variable=enhanceOption, value=3).pack(anchor=W)
+        Radiobutton(smoothingWindow, text="Median Smoothing", variable=enhanceOption, value=4).pack(anchor=W)
+        # Radiobutton(smoothingWindow, text="Power Law (Gamma) Transformations", variable=enhanceOption, value=5).pack(anchor=W)
+
+        arrayLabel = Label(smoothingWindow, text="Array Square Size = ...").pack() #used for reading instructions
+        arrayValue = tk.Entry(smoothingWindow)
+        arrayValue.insert(0, "3")
+        arrayValue.pack() #must be seperate for some reason...
+
+        Button(
+            smoothingWindow, text="Smooth", width=35, bg='silver',
+            command=lambda: executeSmoothing(
+                                intVal=enhanceOption.get(), 
+                                arraySize=int(arrayValue.get()),
+                                img=imgGrayscale, 
+                                imgName=window.filename
+                            ) 
+        ).pack()
+        # Button above sends the user elsewhere
+
+        Button(smoothingWindow, text="Close All Plots", bg="gray", command=lambda: (plt.close('all')) ).pack()
+        
+    else:
+        tellUser("Unable to Get Grayscale Image for Smoothing Window...", labelUpdates)
+###
+
+def executeSmoothing(intVal, arraySize, img, imgName):
+    tellUser("Opening now...", labelUpdates)
+
+    fig = plt.figure(num="Smoothing", figsize=(8, 5))
+    plt.clf() # Should clear last plot but keep window open? 
+
+    fig.add_subplot(1, 2, 1)
+    message = "B\W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
+    plt.imshow(img, cmap='gray')
+    plt.title(message)
+    plt.axis('off') #Removes axes
+
+    fig.add_subplot(1, 2, 2)
+    if (intVal == 1):
+        # histEqualization(img, imgName, fig)
+        simpleSmooth(img, imgName, arraySize)
+    elif (intVal == 2):
+        movingAverageSmooth(img, imgName, arraySize)
+    elif (intVal == 3):
+        gaussianSmooth(img, imgName, arraySize)
+    else:
+        medianSmooth(img, imgName, arraySize)
+
+    plt.tight_layout() # Prevents title overlap in display
+    plt.show()   
+###
+
+def medianSmooth(img, imgName, arraySize):
+    median = cv2.medianBlur(img,arraySize)
+    plt.imshow(median, cmap='gray')
+    plt.title('Median Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off') #Removes axes
+###
+
+def gaussianSmooth(img, imgName, arraySize):
+    blur = cv2.GaussianBlur(img,(arraySize,arraySize),0)
+    plt.imshow(blur, cmap='gray')
+    plt.title('Gaussian Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off') #Removes axes
+###
+
+def movingAverageSmooth(img, imgName, arraySize):
+    kernel = np.ones((arraySize,arraySize), np.float32)/(arraySize * arraySize) # fills with all 1s
+    dst = cv2.filter2D(img,-1,kernel)
+    
+    plt.subplot(122)
+    plt.imshow(dst, cmap='gray')
+    plt.title('Moving Average Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off') #Removes axes
+###
+
+def simpleSmooth(img, imgName, arraySize):
+    kernel = np.full((arraySize,arraySize), 1/(arraySize * arraySize)) # fills with numbers in array
+    dst = cv2.filter2D(img,-1,kernel)
+    
+    plt.subplot(122)
+    plt.imshow(dst, cmap='gray')
+    plt.title('Simple Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off') #Removes axes
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------
@@ -601,8 +750,8 @@ def tellUser(str, label):
     label.config(text = newText) #global var
 ###
 
-def openGUI():
-    temp = filedialog.askopenfilename(initialdir="Images", title="Select an Image to Open", 
+def openGUI(message):
+    temp = filedialog.askopenfilename(initialdir="Images", title=message, 
                                                     filetypes=(
                                                         ("All Files", "*.*"), ("jpg Files", "*.jpg"), 
                                                         ("png files", "*.png"), ("gif files", "*.gif"),

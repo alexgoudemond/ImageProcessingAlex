@@ -88,7 +88,7 @@ buttonOpen = tk.Button(
 )
 buttonConvert = tk.Button(
     master = buttonFrameTop,
-    text = "Convert Image to Grayscale JPG",
+    text = "Convert Image to ...",
     width = 25,
     height = 5, 
     bg = "silver",

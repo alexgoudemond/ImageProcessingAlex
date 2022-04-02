@@ -27,6 +27,7 @@ import cv2
 import numpy as np
 import os # Path reading, File Writing and Deleting
 from matplotlib import pyplot  as plt
+from math import floor
 
 # Global Vars below
 global window 
@@ -129,12 +130,12 @@ def getGray():
     return imgGrayscale, success
 ###
 
-def imgToGrayscale(convertWindow):
+def imgToGrayscale():
     window.filename = openGUI("Select an Image to Convert")
 
     try:
         currentDir = os.getcwd()
-        os.mkdir(currentDir + "\Images\Converted")
+        os.mkdir(currentDir + "\Images\Converted_Grayscale")
     except FileExistsError as uhoh:
         pass
     except Exception as uhoh:
@@ -149,21 +150,68 @@ def imgToGrayscale(convertWindow):
         
     
     if (success):
-        newName = updateFileName(window.filename, appendedString)
+        newName = updateFileName(window.filename, appendedString, "\Images\Converted_Grayscale\\")
         cv2.imwrite(newName, imgGrayscale)
         tellUser("Image converted successfully", labelUpdates)
     else:
         tellUser("Something went wrong... Unable to open")
 ###
 
-def imgToBinary(window):
-    return True
+# We are going to need scan the image. Numbers above midpoint are 1, numbers below are 0
+def imgToBinary():
+    window.filename = openGUI("Select an Image to Convert")
+
+    imgGrayscale, success = getGray()
+
+    if(success):
+        (x, y) = imgGrayscale.shape
+        print(x, y)
+        imgArray = np.array(imgGrayscale)
+        binaryArray = np.array( [[0 for i in range(y)] for j in range(x)] )
+        # print(imgArray) # Works!
+
+        minNum = np.min(imgArray)
+        maxNum = np.max(imgArray)
+        midpoint = floor( (maxNum - minNum) / 2)
+        # print(midpoint)
+
+        # create binaryArray
+        for i in range(x):
+            for j in range(y):
+                if (imgArray[i][j] >= midpoint):
+                    binaryArray[i][j] = 1
+        
+        # print(binaryArray)
+
+        try:
+            currentDir = os.getcwd()
+            os.mkdir(currentDir + "\Images\Converted_Binary")
+        except FileExistsError as uhoh:
+            pass
+        except Exception as uhoh:
+            print("New Error:", uhoh)
+            pass
+
+        appendedString = "_converted_to_binary"
+
+        if window.filename.endswith(".gif"):
+            appendedString += "_frame_0"
+            
+        # binaryImage = cv2.imread(binaryArray, 0)
+
+        newName = updateFileName(window.filename, appendedString, "\Images\Converted_Binary\\")
+        cv2.imwrite(newName, binaryArray)
+        tellUser("Image converted successfully", labelUpdates)
+
+    else:
+        tellUser("Something went wrong... Unable to get grayscale")
+###
 
 # responsible for converting any image, then saving as grayscale jpg in dedicated folder
 def convertTheImage():
     # open new window - choose Grayscale or Binary
     convertWindow = Toplevel(window)
-    convertWindow.title("What kind of conversion...")
+    convertWindow.title("Convert to...")
     convertWindow.geometry("300x300")
 
     enhanceOption = IntVar()
@@ -173,16 +221,16 @@ def convertTheImage():
     Radiobutton(convertWindow, text="Binary Conversion", variable=enhanceOption, value=2).pack(anchor=W)
 
     Button(convertWindow, text="convert", width=35, bg='silver',
-            command=lambda: executeConversion(intVal=enhanceOption.get(), window=convertWindow ) 
+            command=lambda: executeConversion(intVal=enhanceOption.get() ) 
         ).pack()
 ###
 
-def executeConversion(intVal, window):
+def executeConversion(intVal):
     # grayscale
     if (intVal == 1):
-        imgToGrayscale(window)
+        imgToGrayscale()
     else:
-        imgToBinary(window)
+        imgToBinary()
 ###
 
 def convertOtherImages(imgName):
@@ -265,7 +313,7 @@ def convertGrayscaleGIF(imgName):
 
 #------------------------------------------------------------------------------------Changing names Below-----------------------
 # used to place converted files into dedicated folder
-def updateFileName(imgName, appendedString):
+def updateFileName(imgName, appendedString, directory):
     currentDir = os.getcwd()
 
     finalForwardSlashPos = imgName.rfind("/")
@@ -275,7 +323,7 @@ def updateFileName(imgName, appendedString):
 
     # print(imgName,":::", finalForwardSlashPos, "fileName:", fileName)
 
-    answer = currentDir + "\Images\Converted\\" + fileName + "_from_" + extension  + appendedString + ".jpg"
+    answer = currentDir + directory + fileName + "_from_" + extension  + appendedString + ".jpg"
     
     # print(answer)
 

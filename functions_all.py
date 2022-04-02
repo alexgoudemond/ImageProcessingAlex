@@ -488,7 +488,7 @@ def gammaTransform(img, imgName, cValue, gammaValue, fig):
     displayHist(imageEnhanced, message)
 
     fig.add_subplot(2, 3, 5)
-    message = "Power law (Gamma) Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
+    message = "Gamma Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
     plt.imshow(imageEnhanced, cmap='gray') 
     plt.title(message)
     plt.axis('off') #Removes axes
@@ -504,7 +504,7 @@ def gammaTransform(img, imgName, cValue, gammaValue, fig):
 def logTransform(img, imgName, fig):
     cValue = 255 / np.log(1 + np.max(img))
     imageEnhanced = cValue * np.log(1 + img) 
-    imageEnhanced.reshape(512,512)
+    # imageEnhanced.reshape(512,512)
 
     fig.add_subplot(2, 3, 4)
     message = "Histogram of **Enhanced** B/W JPG of: " + getName(imgName) + "." + getExtension(imgName)
@@ -605,27 +605,15 @@ def chooseSharpeningOption():
 ###
 
 def executeSharpening(imgGrayscale, imgName, fig):
-
     # This filter is enough!
-    kernel = np.array([ [0, -1, 0], 
-                        [-1, 5, -1], 
-                        [0, -1, 0] ])
-    # kernel = np.array([ [-1, -1, -1], 
-    #                     [-1,  9, -1], 
-    #                     [-1, -1, -1] ])
-
-    blur = cv2.GaussianBlur(imgGrayscale,(5, 5),0)
-    # blur = cv2.medianBlur(imgGrayscale,3)
+    # kernel = np.array([ [0, -1, 0], 
+    #                     [-1, 5, -1], 
+    #                     [0, -1, 0] ])
     # blur = cv2.filter2D(imgGrayscale,-1,kernel)
+    
+    blur = cv2.medianBlur(imgGrayscale, 3)
     edgesOnly = imgGrayscale - blur
-    smoothedImage = imgGrayscale + edgesOnly
-
-    # (x, y) = imgGrayscale.shape
-    # print(getPartOfMatrix(imgGrayscale, x, y,  "Grayscale Img"))
-    # (x, y) = blur.shape
-    # print(getPartOfMatrix(blur, x, y,  "Blur Img"))
-    # (x, y) = smoothedImage.shape
-    # print(getPartOfMatrix(smoothedImage, x, y,  "smooth Img"))
+    sharpenedImage = imgGrayscale + edgesOnly
 
     fig.add_subplot(1, 3, 1)
     plt.imshow(imgGrayscale, cmap='gray')
@@ -638,12 +626,13 @@ def executeSharpening(imgGrayscale, imgName, fig):
     plt.axis('off')
 
     fig.add_subplot(1, 3, 3)
-    plt.imshow(smoothedImage, cmap='gray')
+    plt.imshow(sharpenedImage, cmap='gray')
     plt.title('Sharpened Image of: '+ getName(imgName) + "." + getExtension(imgName) )
     plt.axis('off')
 
     plt.tight_layout() # Prevents title overlap in display
     plt.show()
+###
 
 def chooseSmoothingOption():
     window.filename = openGUI("Select an Image to Smooth")
@@ -689,7 +678,7 @@ def chooseSmoothingOption():
 def executeSmoothing(intVal, arraySize, img, imgName):
     tellUser("Opening now...", labelUpdates)
 
-    fig = plt.figure(num="Smoothing", figsize=(10, 5))
+    fig = plt.figure(num="Smoothing", figsize=(8, 5))
     plt.clf() # Should clear last plot but keep window open? 
 
     fig.add_subplot(1, 2, 1)

@@ -824,7 +824,82 @@ def simpleSmooth(img, imgName, arraySize):
 #------------------------------------------------------------------------------------Morphological Functions Below--------------
 
 def chooseMorphologyOption():
+    imgBinary, success = getBinary()
+
+    if (success):
+        # Open new window to choose enhancement
+        morphWindow = Toplevel(window)
+        morphWindow.title("Choose an option...")
+        morphWindow.geometry("300x300")
+
+        enhanceOption = IntVar()
+        enhanceOption.set(0)
+        
+        Radiobutton(morphWindow, text="Dilation", variable=enhanceOption, value=1).pack(anchor=W)
+        Radiobutton(morphWindow, text="Erosion", variable=enhanceOption, value=2).pack(anchor=W)
+        Radiobutton(morphWindow, text="Opening", variable=enhanceOption, value=3).pack(anchor=W)
+        Radiobutton(morphWindow, text="Closing", variable=enhanceOption, value=4).pack(anchor=W)
+        Radiobutton(morphWindow, text="Boundary Extraction", variable=enhanceOption, value=5).pack(anchor=W)
+        # Radiobutton(smoothingWindow, text="Power Law (Gamma) Transformations", variable=enhanceOption, value=5).pack(anchor=W)
+
+        Button(morphWindow, text="morph", width=35, bg='gray',
+            command=lambda: executeMorphOption(intVal=enhanceOption.get(), binaryArray=imgBinary, imgName=window.filename) 
+        ).pack()
+        
+    else:
+        tellUser("Unable to Get Grayscale Image for Morphological Window...", labelUpdates)
     return True
+###
+
+def executeMorphOption(intVal, binaryArray, imgName):
+    fig = plt.figure(num="Morphological Changes", figsize=(8, 4))
+    plt.clf() # Should clear last plot but keep window open? 
+
+    fig.add_subplot(1, 2, 1)
+
+    plt.imshow(binaryArray, cmap='gray')
+    plt.title('Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.axis('off') #Removes axes
+
+    fig.add_subplot(1, 2, 2)
+
+    if (intVal == 1):
+        plt.title('Dilation of '+ getName(imgName) + "." + getExtension(imgName) )
+
+        dilatedArray = executeDilation(array=binaryArray)
+        
+        plt.imshow(dilatedArray, cmap='gray')
+        plt.title('Dilated Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+    # elif (intVal == 2):
+    #     ###
+    # elif (intVal == 3):
+    #     ###
+    # elif (intVal == 4):
+    #     ###
+    # else:
+    #     ###
+    plt.show()
+###
+
+# here, we dilate an image
+def executeDilation(array):
+    structuringElement =   [ [0, 1, 0],
+                             [1, 1, 1],
+                             [0, 1, 0] ]
+
+    paddedArray = np.pad(array, (1, 1), 'constant', constant_values=(0, 0))
+    (x, y) = (paddedArray.shape)
+    
+    # This will be dilated - slice later
+    newArray = np.array( [[0 for i in range(y)] for j in range(x)] )
+
+    for i in range(1, x-1):
+        for j in range(1, y-1):
+            if (paddedArray[i-1][j] == 1) or (paddedArray[i][j-1] == 1) or (paddedArray[i][j+1] == 1) or (paddedArray[i+1][j] == 1):
+                newArray[i][j] = 1
+
+    return newArray
+###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 

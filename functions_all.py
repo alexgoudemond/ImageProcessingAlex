@@ -157,15 +157,14 @@ def imgToGrayscale():
         tellUser("Something went wrong... Unable to open")
 ###
 
-# We are going to need scan the image. Numbers above midpoint are 1, numbers below are 0
-def imgToBinary():
+def getBinary():
     window.filename = openGUI("Select an Image to Convert")
 
     imgGrayscale, success = getGray()
 
-    if(success):
+    if (success):
         (x, y) = imgGrayscale.shape
-        print(x, y)
+        # print(x, y)
         imgArray = np.array(imgGrayscale)
         binaryArray = np.array( [[0 for i in range(y)] for j in range(x)] )
         # print(imgArray) # Works!
@@ -180,9 +179,18 @@ def imgToBinary():
             for j in range(y):
                 if (imgArray[i][j] >= midpoint):
                     binaryArray[i][j] = 1
-        
-        # print(binaryArray)
+    
+        return binaryArray, success
+    else:
+        return [], success
 
+# We are going to need scan the image. Numbers above midpoint are 1, numbers below are 0
+def imgToBinary():
+    # window.filename = openGUI("Select an Image to Convert")
+
+    binaryArray, success = getBinary()
+
+    if (success):
         try:
             currentDir = os.getcwd()
             os.mkdir(currentDir + "\Images\Converted_Binary")

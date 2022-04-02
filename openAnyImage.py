@@ -134,9 +134,9 @@ buttonSharpen = tk.Button(
     bg = "silver",
     command = chooseSharpeningOption
 )
-button8 = tk.Button(
+buttonMorphology = tk.Button(
     master = buttonFrameMiddle,
-    text = "8",
+    text = "Alter Image Shape (Morphology)",
     width = 25,
     height = 5, 
     bg = "silver"
@@ -190,7 +190,7 @@ buttonAllIntensityValues.pack(side = tk.RIGHT)
 buttonEnhance.pack(side = tk.LEFT)
 buttonSmooth.pack(side = tk.LEFT)
 buttonSharpen.pack(side = tk.LEFT)
-button8.pack(side = tk.RIGHT)
+buttonMorphology.pack(side = tk.RIGHT)
 
 button9.pack(side = tk.LEFT)
 button10.pack(side = tk.LEFT)

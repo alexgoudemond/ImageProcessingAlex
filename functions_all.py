@@ -183,6 +183,7 @@ def getBinary():
         return binaryArray, success
     else:
         return [], success
+###
 
 # We are going to need scan the image. Numbers above midpoint are 1, numbers below are 0
 def imgToBinary():

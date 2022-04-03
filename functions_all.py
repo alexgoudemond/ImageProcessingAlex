@@ -59,6 +59,8 @@ def openTheImage():
         cv2.imshow(window.filename, image)
         cv2.waitKey(0)
         cv2.destroyAllWindows() #Upon Keypress, close window
+    elif ("binary" in window.filename):
+        success = displayBinary(window.filename)
     else:
         success = displayImage(window.filename)
 
@@ -101,6 +103,29 @@ def displayGIF(imgName):
 
     return True
 ###
+
+def displayBinary(imgName):
+    try:
+        image = cv2.imread(imgName, 0)
+
+        # Weird Bug! OpenCV somehow adds 2 to binary images when reading...
+        # Loop below removes such cases manually
+        (x, y) = image.shape
+        for a in range(x):
+            for b in range(y):
+                if (image[a][b] > 1):
+                    image[a][b] = 1
+
+        # Show in Matplotlib as opencv treats as grayscale (all black to human eye)
+        fig = plt.figure(imgName)
+        plt.imshow(image, cmap="gray")
+        plt.axis('off')
+        plt.show()
+
+        return True
+    except Exception as uhoh:
+        print("New Error:", uhoh)
+        return False
 
 def displayImage(imgName):
     try:
@@ -190,6 +215,7 @@ def imgToBinary():
     # window.filename = openGUI("Select an Image to Convert")
 
     binaryArray, success = getBinary()
+
 
     if (success):
         try:

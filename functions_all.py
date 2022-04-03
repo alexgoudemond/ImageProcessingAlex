@@ -885,7 +885,6 @@ def executeMorphOption(intVal, binaryArray, imgName):
 
     plt.imshow(binaryArray, cmap='gray')
     plt.title('Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
-    plt.axis('off') #Removes axes
 
     fig.add_subplot(1, 2, 2)
 
@@ -896,8 +895,13 @@ def executeMorphOption(intVal, binaryArray, imgName):
         
         plt.imshow(dilatedArray, cmap='gray')
         plt.title('Dilated Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
-    # elif (intVal == 2):
-    #     ###
+    elif (intVal == 2):
+        plt.title('Erosion of '+ getName(imgName) + "." + getExtension(imgName) )
+
+        dilatedArray = executeErosion(array=binaryArray)
+        
+        plt.imshow(dilatedArray, cmap='gray')
+        plt.title('Eroded Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
     # elif (intVal == 3):
     #     ###
     # elif (intVal == 4):
@@ -908,14 +912,36 @@ def executeMorphOption(intVal, binaryArray, imgName):
 ###
 
 # here, we dilate an image
-def executeDilation(array):
-    structuringElement =   [ [0, 1, 0],
-                             [1, 1, 1],
-                             [0, 1, 0] ]
+def executeErosion(array):
+    # pattern used in for loop, this is here for reference
+    # structuringElement =   [ [0, 1, 0],
+    #                          [1, 1, 1],
+    #                          [0, 1, 0] ]
 
     paddedArray = np.pad(array, (1, 1), 'constant', constant_values=(0, 0))
     (x, y) = (paddedArray.shape)
-    
+
+    # This will be dilated - slice later
+    newArray = np.array( [[0 for i in range(y)] for j in range(x)] )
+
+    for i in range(1, x-1):
+        for j in range(1, y-1):
+            if (paddedArray[i-1][j] == 1) and (paddedArray[i][j-1] == 1) and (paddedArray[i][j+1] == 1) and (paddedArray[i+1][j] == 1):
+                newArray[i][j] = 1
+
+    return newArray[ 1 : x , 1 : y ] # slice and return
+###
+
+# here, we dilate an image
+def executeDilation(array):
+    # pattern used in for loop, this is here for reference
+    # structuringElement =   [ [0, 1, 0],
+    #                          [1, 1, 1],
+    #                          [0, 1, 0] ]
+
+    paddedArray = np.pad(array, (1, 1), 'constant', constant_values=(0, 0))
+    (x, y) = (paddedArray.shape)
+
     # This will be dilated - slice later
     newArray = np.array( [[0 for i in range(y)] for j in range(x)] )
 
@@ -924,8 +950,10 @@ def executeDilation(array):
             if (paddedArray[i-1][j] == 1) or (paddedArray[i][j-1] == 1) or (paddedArray[i][j+1] == 1) or (paddedArray[i+1][j] == 1):
                 newArray[i][j] = 1
 
-    return newArray
+    return newArray[ 1 : x , 1 : y ] # slice and return
 ###
+
+
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 

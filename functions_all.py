@@ -889,29 +889,67 @@ def executeMorphOption(intVal, binaryArray, imgName):
     fig.add_subplot(1, 2, 2)
 
     if (intVal == 1):
-        plt.title('Dilation of '+ getName(imgName) + "." + getExtension(imgName) )
-
         dilatedArray = executeDilation(array=binaryArray)
         
         plt.imshow(dilatedArray, cmap='gray')
         plt.title('Dilated Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
     elif (intVal == 2):
-        plt.title('Erosion of '+ getName(imgName) + "." + getExtension(imgName) )
-
         dilatedArray = executeErosion(array=binaryArray)
         
         plt.imshow(dilatedArray, cmap='gray')
         plt.title('Eroded Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
-    # elif (intVal == 3):
-    #     ###
-    # elif (intVal == 4):
-    #     ###
-    # else:
-    #     ###
+    elif (intVal == 3):
+        dilatedArray = executeOpening(array=binaryArray)
+        
+        plt.imshow(dilatedArray, cmap='gray')
+        plt.title('Opening Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+    elif (intVal == 4):
+        dilatedArray = executeClosing(array=binaryArray)
+        
+        plt.imshow(dilatedArray, cmap='gray')
+        plt.title('Closing Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+    else:
+        dilatedArray = executeBoundaryExtraction(array=binaryArray)
+        
+        plt.imshow(dilatedArray, cmap='gray')
+        plt.title('Boundary of Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+
     plt.show()
 ###
 
-# here, we dilate an image
+# here, we get boundary of an image
+def executeBoundaryExtraction(array):
+    erodedArray = executeErosion(array)
+    
+    (x, y) = (array.shape)
+
+    newArray = np.array( [[0 for i in range(y)] for j in range(x)] )
+    
+    for i in range(x):
+        for j in range(y):
+            temp = array[i][j] - erodedArray[i][j]
+
+            if (temp >= 0):
+                newArray[i][j] = temp
+
+    return newArray
+###
+
+# here, we close an image
+def executeClosing(array):
+    dilatedArray = executeDilation(array)
+    closedArray = executeErosion(dilatedArray)
+    return closedArray
+###
+
+# here, we open an image
+def executeOpening(array):
+    erodedArray = executeErosion(array)
+    openedArray = executeDilation(erodedArray)
+    return openedArray
+###
+
+# here, we erode an image
 def executeErosion(array):
     # pattern used in for loop, this is here for reference
     # structuringElement =   [ [0, 1, 0],

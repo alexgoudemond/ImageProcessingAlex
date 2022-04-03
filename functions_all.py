@@ -149,9 +149,20 @@ def getGray():
         
     elif window.filename.endswith(".raw"):
         imgGrayscale, success = convertRAW(window.filename) 
-
+        
     else:
         imgGrayscale, success = convertOtherImages(window.filename)
+
+    # handles bug for all other functions that invoke getGray()
+    if ("binary" in window.filename):
+        # Weird Bug! OpenCV somehow adds 2 to binary images when reading...
+        # Loop below removes such cases manually
+        (x, y) = imgGrayscale.shape
+        for a in range(x):
+            for b in range(y):
+                if (imgGrayscale[a][b] > 1):
+                    imgGrayscale[a][b] = 1
+
     return imgGrayscale, success
 ###
 
@@ -543,7 +554,7 @@ def executeEnhancement(intVal, img, imgName):
     fig.add_subplot(2, 3, 1)
     message = "B/W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
     plt.imshow(img, cmap='gray')
-    plt.title(message)
+    plt.title(message, wrap=True)
     plt.axis('off') #Removes axes
     
     fig.add_subplot(2, 3, 2)
@@ -586,7 +597,7 @@ def executeEnhancement(intVal, img, imgName):
 
 def TransformationFunction(message, input, output):
     plt.plot(input, output)
-    plt.title(message)
+    plt.title(message, wrap=True)
     plt.xlabel('Input Intensity Values')
     plt.ylabel('Output Intensity Values')
 ###
@@ -601,7 +612,7 @@ def gammaTransform(img, imgName, cValue, gammaValue, fig):
     fig.add_subplot(2, 3, 5)
     message = "Gamma Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
     plt.imshow(imageEnhanced, cmap='gray') 
-    plt.title(message)
+    plt.title(message, wrap=True)
     plt.axis('off') #Removes axes
 
     fig.add_subplot(2, 3, 3)
@@ -624,7 +635,7 @@ def logTransform(img, imgName, fig):
     fig.add_subplot(2, 3, 5)
     message = "Logarithmic Transformation of Image: " + getName(imgName) + "." + getExtension(imgName)
     plt.imshow(imageEnhanced, cmap='gray')
-    plt.title(message)
+    plt.title(message, wrap=True)
     plt.axis('off') #Removes axes
     
     fig.add_subplot(2, 3, 3)
@@ -642,7 +653,7 @@ def thresholding(img, imgName, fig):
     fig.add_subplot(2, 3, 5)
     message = "Thresholding of Image: " + getName(imgName) + "." + getExtension(imgName)
     plt.imshow(imageEnhanced, cmap='gray')
-    plt.title(message)
+    plt.title(message, wrap=True)
     plt.axis('off') #Removes axes
     
     fig.add_subplot(2, 3, 3)
@@ -661,7 +672,7 @@ def negImage(img, imgName, fig):
     fig.add_subplot(2, 3, 5)
     message = "Negative Image of: " + getName(imgName) + "." + getExtension(imgName)
     plt.imshow(imageEnhanced, cmap='gray')
-    plt.title(message)
+    plt.title(message, wrap=True)
     plt.axis('off') #Removes axes
     
     fig.add_subplot(2, 3, 3)
@@ -679,7 +690,7 @@ def histEqualization(img, imgName, fig):
     message = "Histogram Equalized Image of: " + getName(imgName) + "." + getExtension(imgName)
     fig.add_subplot(2, 3, 5)
     plt.imshow(imgEnhanced, cmap='gray')
-    plt.title(message)
+    plt.title(message, wrap=True)
     plt.axis('off') #Removes axes
 
     message = "Transformation Function: "
@@ -689,8 +700,8 @@ def histEqualization(img, imgName, fig):
 
 # bins are qty of histogram pieces, range is for width of graph
 def displayHist(img, str):
+    plt.title(str, wrap=True)
     plt.hist(img.ravel(), bins=256, range=[0,256])
-    plt.title(str)
     plt.xlabel('Gray Levels')
     plt.ylabel('Frequencies')
 ###
@@ -728,17 +739,17 @@ def executeSharpening(imgGrayscale, imgName, fig):
 
     fig.add_subplot(1, 3, 1)
     plt.imshow(imgGrayscale, cmap='gray')
-    plt.title('B\W Image of: '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('B\W Image of: '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     plt.axis('off')
 
     fig.add_subplot(1, 3, 2)
     plt.imshow(edgesOnly, cmap='gray')
-    plt.title('Edges of: '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Edges of: '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     plt.axis('off')
 
     fig.add_subplot(1, 3, 3)
     plt.imshow(sharpenedImage, cmap='gray')
-    plt.title('Sharpened Image of: '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Sharpened Image of: '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     plt.axis('off')
 
     plt.tight_layout() # Prevents title overlap in display
@@ -795,7 +806,7 @@ def executeSmoothing(intVal, arraySize, img, imgName):
     fig.add_subplot(1, 2, 1)
     message = "B\W JPG Image of: " + getName(imgName) + "." + getExtension(imgName)
     plt.imshow(img, cmap='gray')
-    plt.title(message)
+    plt.title(message, wrap=True)
     plt.axis('off') #Removes axes
 
     fig.add_subplot(1, 2, 2)
@@ -816,14 +827,14 @@ def executeSmoothing(intVal, arraySize, img, imgName):
 def medianSmooth(img, imgName, arraySize):
     median = cv2.medianBlur(img,arraySize)
     plt.imshow(median, cmap='gray')
-    plt.title('Median Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Median Smooth of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     plt.axis('off') #Removes axes
 ###
 
 def gaussianSmooth(img, imgName, arraySize):
     blur = cv2.GaussianBlur(img,(arraySize,arraySize),0)
     plt.imshow(blur, cmap='gray')
-    plt.title('Gaussian Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Gaussian Smooth of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     plt.axis('off') #Removes axes
 ###
 
@@ -833,7 +844,7 @@ def movingAverageSmooth(img, imgName, arraySize):
     
     plt.subplot(122)
     plt.imshow(dst, cmap='gray')
-    plt.title('Moving Average Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Moving Average Smooth of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     plt.axis('off') #Removes axes
 ###
 
@@ -843,7 +854,7 @@ def simpleSmooth(img, imgName, arraySize):
     
     plt.subplot(122)
     plt.imshow(dst, cmap='gray')
-    plt.title('Simple Smooth of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Simple Smooth of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     plt.axis('off') #Removes axes
 ###
 
@@ -884,7 +895,7 @@ def executeMorphOption(intVal, binaryArray, imgName):
     fig.add_subplot(1, 2, 1)
 
     plt.imshow(binaryArray, cmap='gray')
-    plt.title('Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+    plt.title('Binary Image of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
 
     fig.add_subplot(1, 2, 2)
 
@@ -892,27 +903,27 @@ def executeMorphOption(intVal, binaryArray, imgName):
         dilatedArray = executeDilation(array=binaryArray)
         
         plt.imshow(dilatedArray, cmap='gray')
-        plt.title('Dilated Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+        plt.title('Dilated Binary Image of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     elif (intVal == 2):
         dilatedArray = executeErosion(array=binaryArray)
         
         plt.imshow(dilatedArray, cmap='gray')
-        plt.title('Eroded Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+        plt.title('Eroded Binary Image of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     elif (intVal == 3):
         dilatedArray = executeOpening(array=binaryArray)
         
         plt.imshow(dilatedArray, cmap='gray')
-        plt.title('Opening Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+        plt.title('Opening Binary Image of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     elif (intVal == 4):
         dilatedArray = executeClosing(array=binaryArray)
         
         plt.imshow(dilatedArray, cmap='gray')
-        plt.title('Closing Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+        plt.title('Closing Binary Image of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     else:
         dilatedArray = executeBoundaryExtraction(array=binaryArray)
         
         plt.imshow(dilatedArray, cmap='gray')
-        plt.title('Boundary of Binary Image of '+ getName(imgName) + "." + getExtension(imgName) )
+        plt.title('Boundary of Binary Image of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
 
     plt.show()
 ###

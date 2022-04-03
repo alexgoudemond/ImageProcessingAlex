@@ -41,7 +41,8 @@ Create a folder called Images in the same directory as this and place Pics
 """
 #----------------------------------------------------------------------------------------------------------------Packages Below
 # Encapsulating functions from our dedicated functions file
-from functions_all import chooseEnhancement, chooseSharpeningOption, chooseSmoothingOption, openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues
+from functions_all import   (chooseEnhancement, chooseMorphologyOption, chooseSharpeningOption, chooseSmoothingOption, 
+                            openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues)
 # global Vars to use
 from functions_all import window, labelUpdates, updateFrame
 
@@ -88,7 +89,7 @@ buttonOpen = tk.Button(
 )
 buttonConvert = tk.Button(
     master = buttonFrameTop,
-    text = "Convert Image to Grayscale JPG",
+    text = "Convert Image to ...",
     width = 25,
     height = 5, 
     bg = "silver",
@@ -134,12 +135,13 @@ buttonSharpen = tk.Button(
     bg = "silver",
     command = chooseSharpeningOption
 )
-button8 = tk.Button(
+buttonMorphology = tk.Button(
     master = buttonFrameMiddle,
-    text = "8",
+    text = "Alter Image Shape (Morphology)",
     width = 25,
     height = 5, 
-    bg = "silver"
+    bg = "silver",
+    command = chooseMorphologyOption
 )
 button9 = tk.Button(
     master = buttonFrameBottom,
@@ -190,7 +192,7 @@ buttonAllIntensityValues.pack(side = tk.RIGHT)
 buttonEnhance.pack(side = tk.LEFT)
 buttonSmooth.pack(side = tk.LEFT)
 buttonSharpen.pack(side = tk.LEFT)
-button8.pack(side = tk.RIGHT)
+buttonMorphology.pack(side = tk.RIGHT)
 
 button9.pack(side = tk.LEFT)
 button10.pack(side = tk.LEFT)

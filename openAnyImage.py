@@ -66,8 +66,9 @@ buttonFrameBottom = tk.Frame()
 
 # Below lets us add image inside Label
 photoPath = Image.open("E:/OpenCV/Images/test.jpg")
+# Dimensions of image are 1024 x 682
 scale = 1.5
-resizedHeight = (int) (1024 / scale)
+resizedHeight = (int) (1024 / scale) 
 resizedWidth = (int) (682 / scale)
 resizedPhoto = photoPath.resize( (resizedHeight, resizedWidth), Image.ANTIALIAS)
 photo = ImageTk.PhotoImage(resizedPhoto)

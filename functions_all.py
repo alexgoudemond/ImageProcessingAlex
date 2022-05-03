@@ -1023,8 +1023,8 @@ def chooseMaskOption():
         Radiobutton(maskWindow, text="Vertical 3x3", variable=maskOption, value=3).pack(anchor=W)
         Radiobutton(maskWindow, text="+45 degrees 3x3", variable=maskOption, value=4).pack(anchor=W)
         Radiobutton(maskWindow, text="-45 degrees 3x3", variable=maskOption, value=5).pack(anchor=W)
-        Radiobutton(maskWindow, text="Prewitt 3x3", variable=maskOption, value=6).pack(anchor=W)
-        Radiobutton(maskWindow, text="Sobel 3x3", variable=maskOption, value=7).pack(anchor=W)
+        # Radiobutton(maskWindow, text="Prewitt 3x3", variable=maskOption, value=6).pack(anchor=W)
+        # Radiobutton(maskWindow, text="Sobel 3x3", variable=maskOption, value=7).pack(anchor=W)
 
         Button(maskWindow, text="Apply Mask", width=35, bg='gray',
             command=lambda: executeMaskOption(intVal=maskOption.get(), img=imgGrayscale, imgName=window.filename) 
@@ -1048,15 +1048,24 @@ def executeMaskOption(intVal, img, imgName):
     # 7 options
     if (intVal == 1):
         # Laplacian Mask
-        applyLaplacianMask(fig, img, imgName)
-    # elif (intVal == 2):
-    #     #
-    # elif (intVal == 3):
-    #     #
-    # elif (intVal == 4):
-    #     #
-    # elif (intVal == 5):
-    #     #
+        newImg, mask = applyLaplacianMask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 2):
+        # Horizontal Mask
+        newImg, mask = applyHorizontalMask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 3):
+        # Vertical Mask
+        newImg, mask = applyVerticalMask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 4):
+        # +45 degree Mask
+        newImg, mask = applyPositive45Mask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 5):
+        # -45 degree Mask
+        newImg, mask = applyNegative45Mask(img)
+        plotMask(fig, newImg, mask, imgName)
     # elif (intVal == 6):
     #     #
     # elif (intVal == 7):
@@ -1071,16 +1080,8 @@ def executeMaskOption(intVal, img, imgName):
     return True
 ###
 
-def applyLaplacianMask(fig, img, imgName):
-    mask = np.array(    [[1,  1, 1],
-                         [1, -8, 1],
-                         [1,  1, 1]] 
-            )
-
-    newImg = cv2.filter2D(img, -1, mask)
-
+def plotMask(fig, newImg, mask, imgName):
     fig.add_subplot(1, 3, 2)
-
     plt.imshow(newImg, cmap='gray')
     plt.title('Laplacian Mask over '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
     plt.axis('off') #Removes axes
@@ -1089,6 +1090,61 @@ def applyLaplacianMask(fig, img, imgName):
     plt.text(0.3, 0.7, "Mask")
     plt.table(cellText=mask, loc='center')
     plt.axis('off') #Removes axes
+###
+
+def applyNegative45Mask(img):
+    mask = np.array(    [[-1, -1,  2],
+                         [-1,  2, -1],
+                         [ 2, -1, -1]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applyPositive45Mask(img):
+    mask = np.array(    [[ 2, -1, -1],
+                         [-1,  2, -1],
+                         [-1, -1,  2]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applyVerticalMask(img):
+    mask = np.array(    [[-1, 2, -1],
+                         [-1, 2, -1],
+                         [-1, 2, -1]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applyHorizontalMask(img):
+    mask = np.array(    [[-1, -1, -1],
+                         [ 2,  2,  2],
+                         [-1, -1, -1]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applyLaplacianMask(img):
+    mask = np.array(    [[1,  1, 1],
+                         [1, -8, 1],
+                         [1,  1, 1]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask
 ###
     
 

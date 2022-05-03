@@ -116,7 +116,7 @@ buttonAllIntensityValues = tk.Button(
     command = downloadBWIntensityValues
 )
 buttonEnhance = tk.Button(
-    master = buttonFrameMiddle,
+    master = buttonFrameTop,
     text = "Enhance an Image",
     width = 25,
     height = 5, 
@@ -148,14 +148,14 @@ buttonMorphology = tk.Button(
     command = chooseMorphologyOption
 )
 button9 = tk.Button(
-    master = buttonFrameBottom,
+    master = buttonFrameMiddle,
     text = "9",
     width = 25,
     height = 5, 
     bg = "silver",
 )
 button10 = tk.Button(
-    master = buttonFrameBottom,
+    master = buttonFrameMiddle,
     text = "10",
     width = 25,
     height = 5, 
@@ -164,6 +164,27 @@ button10 = tk.Button(
 button11 = tk.Button(
     master = buttonFrameBottom,
     text = "11",
+    width = 25,
+    height = 5, 
+    bg = "silver",
+)
+button12 = tk.Button(
+    master = buttonFrameBottom,
+    text = "12",
+    width = 25,
+    height = 5, 
+    bg = "silver",
+)
+button13 = tk.Button(
+    master = buttonFrameBottom,
+    text = "13",
+    width = 25,
+    height = 5, 
+    bg = "silver",
+)
+button14 = tk.Button(
+    master = buttonFrameBottom,
+    text = "14",
     width = 25,
     height = 5, 
     bg = "silver",
@@ -191,16 +212,20 @@ labelUpdates.pack()
 buttonOpen.pack(side = tk.LEFT)
 buttonConvert.pack(side = tk.LEFT)
 buttonIntensityValues.pack(side = tk.LEFT)
+buttonEnhance.pack(side = tk.LEFT)
 buttonAllIntensityValues.pack(side = tk.RIGHT)
 
-buttonEnhance.pack(side = tk.LEFT)
+
 buttonSmooth.pack(side = tk.LEFT)
 buttonSharpen.pack(side = tk.LEFT)
-buttonMorphology.pack(side = tk.RIGHT)
-
+buttonMorphology.pack(side = tk.LEFT)
 button9.pack(side = tk.LEFT)
-button10.pack(side = tk.LEFT)
+button10.pack(side = tk.RIGHT)
+
 button11.pack(side = tk.LEFT)
+button12.pack(side = tk.LEFT)
+button13.pack(side = tk.LEFT)
+button14.pack(side = tk.LEFT)
 buttonClose.pack(side = tk.RIGHT)
 
 #------------------------------------------------------------------------------------Open Below---------------------------------

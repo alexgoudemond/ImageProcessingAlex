@@ -1013,22 +1013,45 @@ def chooseMaskOption():
         # Open new window to choose enhancement
         maskWindow = Toplevel(window)
         maskWindow.title("Choose a mask...")
-        maskWindow.geometry("300x300")
+        maskWindow.geometry("300x400")
 
-        maskOption = IntVar()
-        maskOption.set(0)
-        
-        Radiobutton(maskWindow, text="Laplacian 3x3", variable=maskOption, value=1).pack(anchor=W)
-        Radiobutton(maskWindow, text="Horizontal 3x3", variable=maskOption, value=2).pack(anchor=W)
-        Radiobutton(maskWindow, text="Vertical 3x3", variable=maskOption, value=3).pack(anchor=W)
-        Radiobutton(maskWindow, text="+45 degrees 3x3", variable=maskOption, value=4).pack(anchor=W)
-        Radiobutton(maskWindow, text="-45 degrees 3x3", variable=maskOption, value=5).pack(anchor=W)
-        # Radiobutton(maskWindow, text="Prewitt 3x3", variable=maskOption, value=6).pack(anchor=W)
-        # Radiobutton(maskWindow, text="Sobel 3x3", variable=maskOption, value=7).pack(anchor=W)
+        maskOption1 = IntVar()
+        maskOption1.set(0)
+
+        R1 = Radiobutton(maskWindow, text="Laplacian 3x3", variable=maskOption1, value=1)
+        R1.pack(anchor=W, side="top")
+        R2 = Radiobutton(maskWindow, text="\'Standard\' Horizontal", variable=maskOption1, value=2)
+        R2.pack(anchor=W, side="top")
+        R3 = Radiobutton(maskWindow, text="\'Standard\' Vertical", variable=maskOption1, value=3)
+        R3.pack(anchor=W, side="top")
+        R4 = Radiobutton(maskWindow, text="\'Standard\' +45 degrees", variable=maskOption1, value=4)
+        R4.pack(anchor=W, side="top")
+        R5 = Radiobutton(maskWindow, text="\'Standard\' -45 degrees", variable=maskOption1, value=5)
+        R5.pack(anchor=W, side="top")
+        R6 = Radiobutton(maskWindow, text="\'Prewitt\' Horizontal", variable=maskOption1, value=6)
+        R6.pack(anchor=W, side="top")
+        R7 = Radiobutton(maskWindow, text="\'Prewitt\' Vertical", variable=maskOption1, value=7)
+        R7.pack(anchor=W, side="top")
+        R8 = Radiobutton(maskWindow, text="\'Prewitt\' +45 degrees", variable=maskOption1, value=8)
+        R8.pack(anchor=W, side="top")
+        R9 = Radiobutton(maskWindow, text="\'Prewitt\' -45 degrees", variable=maskOption1, value=9)
+        R9.pack(anchor=W, side="top")
+        R10 = Radiobutton(maskWindow, text="\'Sobel\' Horizontal", variable=maskOption1, value=10)
+        R10.pack(anchor=W, side="top")
+        R11 = Radiobutton(maskWindow, text="\'Sobel\' Vertical", variable=maskOption1, value=11)
+        R11.pack(anchor=W, side="top")
+        R12 = Radiobutton(maskWindow, text="\'Sobel\' +45 degrees", variable=maskOption1, value=12)
+        R12.pack(anchor=W, side="top")
+        R13 = Radiobutton(maskWindow, text="\'Sobel\' -45 degrees", variable=maskOption1, value=13)
+        R13.pack(anchor=W, side="top")
 
         Button(maskWindow, text="Apply Mask", width=35, bg='gray',
-            command=lambda: executeMaskOption(intVal=maskOption.get(), img=imgGrayscale, imgName=window.filename) 
+            command=lambda: executeMaskOption(intVal=maskOption1.get(), img=imgGrayscale, imgName=window.filename) 
         ).pack()
+        Button(maskWindow, text="Close Plots", width=35, bg='gray',
+            command=lambda: (plt.close("Mask Changes"))
+        ).pack()
+
     else:
         tellUser("Unable to Get Grayscale Image for Sharpening Window...", labelUpdates)
     
@@ -1052,27 +1075,55 @@ def executeMaskOption(intVal, img, imgName):
         plotMask(fig, newImg, mask, imgName)
     elif (intVal == 2):
         # Horizontal Mask
-        newImg, mask = applyHorizontalMask(img)
+        newImg, mask = applyStandardHorizontalMask(img)
         plotMask(fig, newImg, mask, imgName)
     elif (intVal == 3):
         # Vertical Mask
-        newImg, mask = applyVerticalMask(img)
+        newImg, mask = applyStandardVerticalMask(img)
         plotMask(fig, newImg, mask, imgName)
     elif (intVal == 4):
         # +45 degree Mask
-        newImg, mask = applyPositive45Mask(img)
+        newImg, mask = applyStandardPositive45Mask(img)
         plotMask(fig, newImg, mask, imgName)
     elif (intVal == 5):
         # -45 degree Mask
-        newImg, mask = applyNegative45Mask(img)
+        newImg, mask = applyStandardNegative45Mask(img)
         plotMask(fig, newImg, mask, imgName)
-    # elif (intVal == 6):
-    #     #
-    # elif (intVal == 7):
-    #     #
+    elif (intVal == 6):
+        # Horizontal Mask
+        newImg, mask = applyPrewittHorizontalMask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 7):
+        # Vertical Mask
+        newImg, mask = applyPrewittVerticalMask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 8):
+        # +45 degree Mask
+        newImg, mask = applyPrewittPositive45Mask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 9):
+        # -45 degree Mask
+        newImg, mask = applyPrewittNegative45Mask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 10):
+        # Horizontal Mask
+        newImg, mask = applySobelHorizontalMask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 11):
+        # Vertical Mask
+        newImg, mask = applySobelVerticalMask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 12):
+        # +45 degree Mask
+        newImg, mask = applySobelPositive45Mask(img)
+        plotMask(fig, newImg, mask, imgName)
+    elif (intVal == 13):
+        # -45 degree Mask
+        newImg, mask = applySobelNegative45Mask(img)
+        plotMask(fig, newImg, mask, imgName)
     else:
-        # should never execute
-        tellUser("Invalid option provided in executeMaskOption", labelUpdates)
+        tellUser("Select an option...", labelUpdates)
+ 
 
     plt.tight_layout() # Prevents title overlap in display
     plt.show()  
@@ -1092,7 +1143,95 @@ def plotMask(fig, newImg, mask, imgName):
     plt.axis('off') #Removes axes
 ###
 
-def applyNegative45Mask(img):
+def applySobelNegative45Mask(img):
+    mask = np.array(    [[ 2, -1,  0],
+                         [-1,  0,  1],
+                         [ 0,  1,  2]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applySobelPositive45Mask(img):
+    mask = np.array(    [[ 0,  1,  2],
+                         [-1,  0,  1],
+                         [-2, -1,  0]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applySobelVerticalMask(img):
+    mask = np.array(    [[-1, 0, 1],
+                         [-2, 0, 2],
+                         [-1, 0, 1]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applySobelHorizontalMask(img):
+    mask = np.array(    [[-1, -2, -1],
+                         [ 0,  0,  0],
+                         [ 1,  2,  1]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applyPrewittNegative45Mask(img):
+    mask = np.array(    [[-1, -1,  0],
+                         [-1,  0,  1],
+                         [ 0,  1,  1]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applyPrewittPositive45Mask(img):
+    mask = np.array(    [[ 0,  1,  1],
+                         [-1,  0,  1],
+                         [-1, -1,  0]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applyPrewittVerticalMask(img):
+    mask = np.array(    [[-1, 0, 1],
+                         [-1, 0, 1],
+                         [-1, 0, 1]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applyPrewittHorizontalMask(img):
+    mask = np.array(    [[-1, -1, -1],
+                         [ 0,  0,  0],
+                         [ 1,  1,  1]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    return newImg, mask 
+###
+
+def applyStandardNegative45Mask(img):
     mask = np.array(    [[-1, -1,  2],
                          [-1,  2, -1],
                          [ 2, -1, -1]] 
@@ -1103,7 +1242,7 @@ def applyNegative45Mask(img):
     return newImg, mask 
 ###
 
-def applyPositive45Mask(img):
+def applyStandardPositive45Mask(img):
     mask = np.array(    [[ 2, -1, -1],
                          [-1,  2, -1],
                          [-1, -1,  2]] 
@@ -1114,7 +1253,7 @@ def applyPositive45Mask(img):
     return newImg, mask 
 ###
 
-def applyVerticalMask(img):
+def applyStandardVerticalMask(img):
     mask = np.array(    [[-1, 2, -1],
                          [-1, 2, -1],
                          [-1, 2, -1]] 
@@ -1125,7 +1264,7 @@ def applyVerticalMask(img):
     return newImg, mask 
 ###
 
-def applyHorizontalMask(img):
+def applyStandardHorizontalMask(img):
     mask = np.array(    [[-1, -1, -1],
                          [ 2,  2,  2],
                          [-1, -1, -1]] 

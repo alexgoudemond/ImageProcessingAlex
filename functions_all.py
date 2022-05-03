@@ -1002,6 +1002,98 @@ def executeDilation(array):
     return newArray[ 1 : x , 1 : y ] # slice and return
 ###
 
+#------------------------------------------------------------------------------------Mask Functions Below-----------------------
+
+def chooseMaskOption():
+    window.filename = openGUI("Select an Image...")
+
+    imgGrayscale, success = getGray()
+
+    if (success):
+        # Open new window to choose enhancement
+        maskWindow = Toplevel(window)
+        maskWindow.title("Choose a mask...")
+        maskWindow.geometry("300x300")
+
+        maskOption = IntVar()
+        maskOption.set(0)
+        
+        Radiobutton(maskWindow, text="Laplacian 3x3", variable=maskOption, value=1).pack(anchor=W)
+        Radiobutton(maskWindow, text="Horizontal 3x3", variable=maskOption, value=2).pack(anchor=W)
+        Radiobutton(maskWindow, text="Vertical 3x3", variable=maskOption, value=3).pack(anchor=W)
+        Radiobutton(maskWindow, text="+45 degrees 3x3", variable=maskOption, value=4).pack(anchor=W)
+        Radiobutton(maskWindow, text="-45 degrees 3x3", variable=maskOption, value=5).pack(anchor=W)
+        Radiobutton(maskWindow, text="Prewitt 3x3", variable=maskOption, value=6).pack(anchor=W)
+        Radiobutton(maskWindow, text="Sobel 3x3", variable=maskOption, value=7).pack(anchor=W)
+
+        Button(maskWindow, text="Apply Mask", width=35, bg='gray',
+            command=lambda: executeMaskOption(intVal=maskOption.get(), img=imgGrayscale, imgName=window.filename) 
+        ).pack()
+    else:
+        tellUser("Unable to Get Grayscale Image for Sharpening Window...", labelUpdates)
+    
+    return True
+###
+
+def executeMaskOption(intVal, img, imgName):
+
+    fig = plt.figure(num="Mask Changes", figsize=(8, 4))
+    plt.clf() # Should clear last plot but keep window open? 
+
+    fig.add_subplot(1, 3, 1)
+
+    plt.imshow(img, cmap='gray')
+    plt.title('Original Image of '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
+
+    # 7 options
+    if (intVal == 1):
+        # Laplacian Mask
+        applyLaplacianMask(fig, img, imgName)
+    # elif (intVal == 2):
+    #     #
+    # elif (intVal == 3):
+    #     #
+    # elif (intVal == 4):
+    #     #
+    # elif (intVal == 5):
+    #     #
+    # elif (intVal == 6):
+    #     #
+    # elif (intVal == 7):
+    #     #
+    else:
+        # should never execute
+        tellUser("Invalid option provided in executeMaskOption", labelUpdates)
+
+    plt.tight_layout() # Prevents title overlap in display
+    plt.show()  
+
+    return True
+###
+
+def applyLaplacianMask(fig, img, imgName):
+    mask = np.array(    [[1,  1, 1],
+                         [1, -8, 1],
+                         [1,  1, 1]] 
+            )
+
+    newImg = cv2.filter2D(img, -1, mask)
+
+    fig.add_subplot(1, 3, 2)
+
+    plt.imshow(newImg, cmap='gray')
+    plt.title('Laplacian Mask over '+ getName(imgName) + "." + getExtension(imgName), wrap=True)
+    plt.axis('off') #Removes axes
+
+    fig.add_subplot(1, 3, 3)
+    plt.text(0.3, 0.7, "Mask")
+    plt.table(cellText=mask, loc='center')
+    plt.axis('off') #Removes axes
+###
+    
+
+
+
 
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

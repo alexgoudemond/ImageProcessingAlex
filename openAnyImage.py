@@ -43,7 +43,8 @@ Create a folder called Images in the same directory as this and place Pics
 # Encapsulating functions from our dedicated functions file
 from cv2 import resize
 from functions_all import   (chooseEnhancement, chooseMorphologyOption, chooseSharpeningOption, chooseSmoothingOption, 
-                            openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues)
+                            openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues,
+                            chooseMaskOption)
 # global Vars to use
 from functions_all import window, labelUpdates, updateFrame
 
@@ -147,12 +148,13 @@ buttonMorphology = tk.Button(
     bg = "silver",
     command = chooseMorphologyOption
 )
-button9 = tk.Button(
+buttonMasks = tk.Button(
     master = buttonFrameMiddle,
-    text = "9",
+    text = "Apply a Mask",
     width = 25,
     height = 5, 
     bg = "silver",
+    command = chooseMaskOption
 )
 button10 = tk.Button(
     master = buttonFrameMiddle,
@@ -219,7 +221,7 @@ buttonAllIntensityValues.pack(side = tk.RIGHT)
 buttonSmooth.pack(side = tk.LEFT)
 buttonSharpen.pack(side = tk.LEFT)
 buttonMorphology.pack(side = tk.LEFT)
-button9.pack(side = tk.LEFT)
+buttonMasks.pack(side = tk.LEFT)
 button10.pack(side = tk.RIGHT)
 
 button11.pack(side = tk.LEFT)

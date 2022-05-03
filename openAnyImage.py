@@ -41,6 +41,7 @@ Create a folder called Images in the same directory as this and place Pics
 """
 #----------------------------------------------------------------------------------------------------------------Packages Below
 # Encapsulating functions from our dedicated functions file
+from cv2 import resize
 from functions_all import   (chooseEnhancement, chooseMorphologyOption, chooseSharpeningOption, chooseSmoothingOption, 
                             openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues)
 # global Vars to use
@@ -65,15 +66,17 @@ buttonFrameBottom = tk.Frame()
 
 # Below lets us add image inside Label
 photoPath = Image.open("E:/OpenCV/Images/test.jpg")
-photo = ImageTk.PhotoImage(photoPath)
+scale = 1.5
+resizedHeight = (int) (1024 / scale)
+resizedWidth = (int) (682 / scale)
+resizedPhoto = photoPath.resize( (resizedHeight, resizedWidth), Image.ANTIALIAS)
+photo = ImageTk.PhotoImage(resizedPhoto)
 label = tk.Label(
     master = frame, 
     text = "Welcome! Please choose a button below to begin",
     font = ("Helvetica", 14),
     compound = 'top',
     image = photo,
-    width = 700,
-    height = 500,
     bg = "silver"
 )
 

@@ -1382,10 +1382,29 @@ def chooseEdgeDetectionMethod(intVal, img, imgName):
     print("inside ChooseEdgeDetectionMethod")
 
     '''
+    Canny Edge Detection
     Edge Based
     Search Based
     zero crossing
     '''
+    edgeDetectionWindow = Toplevel(window)
+    edgeDetectionWindow.title("Choose a kind of edgeDetection...")
+    edgeDetectionWindow.geometry("300x300")
+
+    threshOption = IntVar()
+    threshOption.set(0)
+
+    Radiobutton(edgeDetectionWindow, text="Canny Edge Detection", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
+    Radiobutton(edgeDetectionWindow, text="Edge Based Edge Detection", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
+    Radiobutton(edgeDetectionWindow, text="Search Based Edge Detection", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+    Radiobutton(edgeDetectionWindow, text="Zero Crossing Edge Detection", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
+
+    Button(edgeDetectionWindow, text="Choose Segmentation Option", width=50, bg='gray',
+        command=lambda: executeEdgeDetectionChoice(intVal=threshOption.get(), img=img, imgName=imgName)
+    ).pack(anchor=W, side="top")
+    Button(edgeDetectionWindow, text="Close Plots", width=50, bg='gray',
+        command=lambda: ( plt.close("Edge Detection Changes") )
+    ).pack(anchor=W, side="top")
 ###
 
 def chooseContourMethod(intVal, img, imgName):
@@ -1443,11 +1462,8 @@ def chooseThresholdingMethod(intVal, img, imgName):
     '''
     Simple
     Manual / Iterative Thresholding
-    Global
     Adaptive
     Otsus method
-    Niblack Thresholding
-    Sauvola Thresholding
     '''
 
     thresholdingWindow = Toplevel(window)
@@ -1468,6 +1484,37 @@ def chooseThresholdingMethod(intVal, img, imgName):
     Button(thresholdingWindow, text="Close Plots", width=50, bg='gray',
         command=lambda: ( plt.close("Segmentation Changes") )
     ).pack(anchor=W, side="top")
+###
+
+def executeEdgeDetectionChoice(intVal, img, imgName):
+    # room for more choices
+    
+    fig = plt.figure(num="Edge Detection Changes", figsize=(10, 6))
+    plt.clf() # Should clear last plot but keep window open? 
+
+    if (intVal == 1):
+        # Canny Edge Detection
+        edge = cv2.Canny(img,100,200)
+
+        modifiedImageArray = [img, edge]
+        labelArray = ["Original Image", "Canny Edge Detection"]
+        numRows = 2
+        numColumns = 2
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    # elif (intVal == 2):
+    #     # Edge Based
+
+    # elif (intVal == 3):
+    #     # Search Based
+
+    # elif (intVal == 4):
+    #     # zero crossing
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
 ###
 
 def executeClusteringChoice(intVal, img, imgName):
@@ -1508,7 +1555,7 @@ def executeClusteringChoice(intVal, img, imgName):
 
     # elif (intVal == 2):
     #     #
-    
+
     # elif (intVal == 3):
     #     #
     else:

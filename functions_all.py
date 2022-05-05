@@ -1286,9 +1286,10 @@ def applyLaplacianMask(img):
     return newImg, mask
 ###
     
+#------------------------------------------------------------------------------------Segmentation Functions Below---------------
 
-
-
+def chooseSegmentOption():
+    print("Inside segmentation option")
 
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

@@ -1380,10 +1380,24 @@ def executeSegmentOption(intVal, img, imgName):
 
 def chooseEdgeDetectionMethod(intVal, img, imgName):
     print("inside ChooseEdgeDetectionMethod")
+
+    '''
+    Edge Based
+    Search Based
+    zero crossing
+    Region Based
+    Region growing
+    Region splitting and merging
+    '''
 ###
 
 def chooseContourMethod(intVal, img, imgName):
     print("inside ChooseContourMethod")
+    '''
+    Active Contour
+    Mark Boundaries
+    Felzenszwalb's Segmentation
+    '''
 ###
 
 def chooseWatershedMethod(intVal, img, imgName):
@@ -1392,6 +1406,12 @@ def chooseWatershedMethod(intVal, img, imgName):
 
 def chooseClusteringMethod(intVal, img, imgName):
     print("inside ChooseClusteringMethod")
+
+    '''
+    K-means
+    Fuzzy C
+    Linear Iterative Clustering
+    '''
 ###
 
 def chooseRegionBasedMethod(intVal, img, imgName):
@@ -1400,6 +1420,16 @@ def chooseRegionBasedMethod(intVal, img, imgName):
 
 def chooseThresholdingMethod(intVal, img, imgName):
     print("inside ChooseThresholdingMethod")
+    '''
+    Simple
+    Manual / Iterative Thresholding
+    Global
+    Adaptive
+    Otsus method
+    Niblack Thresholding
+    Sauvola Thresholding
+    '''
+
 ###
 
 

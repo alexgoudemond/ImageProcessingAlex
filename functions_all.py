@@ -1289,7 +1289,59 @@ def applyLaplacianMask(img):
 #------------------------------------------------------------------------------------Segmentation Functions Below---------------
 
 def chooseSegmentOption():
-    print("Inside segmentation option")
+    # print("Inside segmentation option")
+    window.filename = openGUI("Select an Image...")
+
+    imgGrayscale, success = getGray()
+
+    if (success):
+
+        # Open a window and show all the options to choose from
+
+        # segmentWindow = tk.Tk(baseName = "segment_Window")
+        segmentWindow = Toplevel(window)
+        segmentWindow.title("Choose a kind of segmentation...")
+        segmentWindow.geometry("500x200")
+
+        segmentOption = IntVar()
+        segmentOption.set(1)
+
+        # left side buttons
+        R1 = Radiobutton(segmentWindow, text="Edge Detection", variable=segmentOption, value=1, width=30)
+        R2 = Radiobutton(segmentWindow, text="Contour Detection", variable=segmentOption, value=2, width=30)
+        R3 = Radiobutton(segmentWindow, text="Watershed Method", variable=segmentOption, value=3, width=30)
+
+        # right side buttons
+        R4 = Radiobutton(segmentWindow, text="Thresholding", variable=segmentOption, value=4, width=30)
+        R5 = Radiobutton(segmentWindow, text="Region Splitting and Merging", variable=segmentOption, value=5, width=30)
+        R6 = Radiobutton(segmentWindow, text="Clustering", variable=segmentOption, value=6, width=30)
+
+        # top labels
+        L1 = Label(segmentWindow, text="Discontinuity Options", width=30)
+        L2 = Label(segmentWindow, text="Continuity Options", width=30)
+
+        B1 = Button(segmentWindow, text="Choose Segmentation Option", width=50, bg='gray',
+            command=lambda: executeSegmentOption(intVal=segmentOption.get(), img=imgGrayscale, imgName=window.filename)
+        )
+
+        # grid layout
+        L1.grid(row=0, column=0)
+        L2.grid(row=0, column=2)
+        R1.grid(row=1, column=0)
+        R2.grid(row=2, column=0)
+        R3.grid(row=3, column=0)
+        R4.grid(row=1, column=2)
+        R5.grid(row=2, column=2)
+        R6.grid(row=3, column=2)
+        B1.grid(columnspan=3)
+    else:
+        tellUser("Unable to Get Grayscale Image for Segmentation Window...", labelUpdates)
+    
+    return True
+###
+
+def executeSegmentOption(intVal, img, imgName):
+    print("Inside executeSegmentOption()")  
 
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

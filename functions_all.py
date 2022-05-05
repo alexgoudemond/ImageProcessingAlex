@@ -1324,7 +1324,7 @@ def chooseSegmentOption():
             command=lambda: executeSegmentOption(intVal=segmentOption.get(), img=imgGrayscale, imgName=window.filename)
         )
         B2 = Button(segmentWindow, text="Close Plots", width=50, bg='gray',
-            command=lambda: (plt.close("Segment Changes"))
+            command=lambda: ( plt.close("Segmentation Changes") )
         )
 
         # grid layout
@@ -1430,7 +1430,56 @@ def chooseThresholdingMethod(intVal, img, imgName):
     Sauvola Thresholding
     '''
 
+    thresholdingWindow = Toplevel(window)
+    thresholdingWindow.title("Choose a kind of Thresholding...")
+    thresholdingWindow.geometry("300x300")
+
+    threshOption = IntVar()
+    threshOption.set(0)
+
+    Radiobutton(thresholdingWindow, text="Simple Thresholding", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Iterative Thresholding", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Global Thresholding", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Adaptive Thresholding", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Otsu's Method", variable=threshOption, value=5, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Niblack Thresholding", variable=threshOption, value=6, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Sauvola Thresholding", variable=threshOption, value=7, width=30).pack(anchor=W, side="top")
+
+    Button(thresholdingWindow, text="Choose Segmentation Option", width=50, bg='gray',
+        command=lambda: executeThresholdingChoice(intVal=threshOption, img=img, imgName=imgName)
+    ).pack(anchor=W, side="top")
+    Button(thresholdingWindow, text="Close Plots", width=50, bg='gray',
+        command=lambda: ( plt.close("Segmentation Changes") )
+    ).pack(anchor=W, side="top")
 ###
+
+def executeThresholdingChoice(intVal, img, imgName):
+    print("Inside executeThresholdingChoice()")
+    # 7 choices
+    # if (intVal == 1):
+    #     # Simple
+
+    # elif (intVal == 2):
+    #     # Iterative Thresholding
+
+    # elif (intVal == 2):
+    #     # Global Thresholding
+
+    # elif (intVal == 2):
+    #     # Adaptive Thresholding
+
+    # elif (intVal == 2):
+    #     # Otsu's Method
+
+    # elif (intVal == 2):
+    #     # Niblack Thresholding
+
+    # elif (intVal == 2):
+    #     # Sauvola Thresholding
+
+    # else:
+    #     # should never execute
+    #     tellUser("Select an option...", labelUpdates)
 
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

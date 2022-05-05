@@ -1323,6 +1323,9 @@ def chooseSegmentOption():
         B1 = Button(segmentWindow, text="Choose Segmentation Option", width=50, bg='gray',
             command=lambda: executeSegmentOption(intVal=segmentOption.get(), img=imgGrayscale, imgName=window.filename)
         )
+        B2 = Button(segmentWindow, text="Close Plots", width=50, bg='gray',
+            command=lambda: (plt.close("Segment Changes"))
+        )
 
         # grid layout
         L1.grid(row=0, column=0)
@@ -1334,6 +1337,8 @@ def chooseSegmentOption():
         R5.grid(row=2, column=2)
         R6.grid(row=3, column=2)
         B1.grid(columnspan=3)
+        B2.grid(columnspan=3)
+
     else:
         tellUser("Unable to Get Grayscale Image for Segmentation Window...", labelUpdates)
     
@@ -1341,7 +1346,61 @@ def chooseSegmentOption():
 ###
 
 def executeSegmentOption(intVal, img, imgName):
-    print("Inside executeSegmentOption()")  
+    # give the user more options based on their choice:
+    if (intVal == 1):
+        # Edge Detection
+        chooseEdgeDetectionMethod(intVal, img, imgName)
+
+    elif (intVal == 2):
+        # Contour Detection
+        chooseContourMethod(intVal, img, imgName)
+
+    elif (intVal == 3):
+        # Watershed Method
+        chooseWatershedMethod(intVal, img, imgName)
+
+    elif (intVal == 4):
+        # Thresholding
+        chooseThresholdingMethod(intVal, img, imgName)
+
+    elif (intVal == 5):
+        # Region Splitting and Merging
+        chooseRegionBasedMethod(intVal, img, imgName)
+
+    elif (intVal == 6):
+        # Clustering
+        chooseClusteringMethod(intVal, img, imgName)
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+
+    # print("Inside executeSegmentOption()")  
+###
+
+def chooseEdgeDetectionMethod(intVal, img, imgName):
+    print("inside ChooseEdgeDetectionMethod")
+###
+
+def chooseContourMethod(intVal, img, imgName):
+    print("inside ChooseContourMethod")
+###
+
+def chooseWatershedMethod(intVal, img, imgName):
+    print("inside ChooseWatershedMethod")
+###
+
+def chooseClusteringMethod(intVal, img, imgName):
+    print("inside ChooseClusteringMethod")
+###
+
+def chooseRegionBasedMethod(intVal, img, imgName):
+    print("inside ChooseRegionBasedMethod")
+###
+
+def chooseThresholdingMethod(intVal, img, imgName):
+    print("inside ChooseThresholdingMethod")
+###
 
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

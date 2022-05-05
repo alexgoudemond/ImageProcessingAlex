@@ -1439,14 +1439,12 @@ def chooseThresholdingMethod(intVal, img, imgName):
 
     Radiobutton(thresholdingWindow, text="Simple Thresholding", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
     Radiobutton(thresholdingWindow, text="Iterative Thresholding", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
-    Radiobutton(thresholdingWindow, text="Global Thresholding", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+    # Radiobutton(thresholdingWindow, text="Global Thresholding", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
     Radiobutton(thresholdingWindow, text="Adaptive Thresholding", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
     Radiobutton(thresholdingWindow, text="Otsu's Method", variable=threshOption, value=5, width=30).pack(anchor=W, side="top")
-    Radiobutton(thresholdingWindow, text="Niblack Thresholding", variable=threshOption, value=6, width=30).pack(anchor=W, side="top")
-    Radiobutton(thresholdingWindow, text="Sauvola Thresholding", variable=threshOption, value=7, width=30).pack(anchor=W, side="top")
 
     Button(thresholdingWindow, text="Choose Segmentation Option", width=50, bg='gray',
-        command=lambda: executeThresholdingChoice(intVal=threshOption, img=img, imgName=imgName)
+        command=lambda: executeThresholdingChoice(intVal=threshOption.get(), img=img, imgName=imgName)
     ).pack(anchor=W, side="top")
     Button(thresholdingWindow, text="Close Plots", width=50, bg='gray',
         command=lambda: ( plt.close("Segmentation Changes") )
@@ -1454,33 +1452,113 @@ def chooseThresholdingMethod(intVal, img, imgName):
 ###
 
 def executeThresholdingChoice(intVal, img, imgName):
-    print("Inside executeThresholdingChoice()")
+    # print("Inside executeThresholdingChoice()")
+
+    fig = plt.figure(num="Segmentation Changes", figsize=(8, 4))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1 # used in matplotlib function below
+    numColumns = 2 # used in matplotlib function below
+
     # 7 choices
-    # if (intVal == 1):
-    #     # Simple
+    if (intVal == 1):
+        # Simple 
+        returnValue, modifiedImage = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+        modifiedImageArray = [img, modifiedImage]
+        labelArray = ["Original Image", "Simple Thresholding"]
 
-    # elif (intVal == 2):
-    #     # Iterative Thresholding
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
-    # elif (intVal == 2):
+    elif (intVal == 2):
+        # Iterative Thresholding
+        modifiedImageArray = [img]
+        labelArray = ["Original Image"]
+        numRows = 3
+        numColumns = 2
+
+        for i in range(2, 6):
+            returnValue, modifiedImage = cv2.threshold(img, (255 // i), 255, cv2.THRESH_BINARY)
+            modifiedImageArray.append(modifiedImage)
+            labelArray.append("Simple Thresholding using \'" + str(255 // i) + "\'")
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    # elif (intVal == 3):
     #     # Global Thresholding
 
-    # elif (intVal == 2):
-    #     # Adaptive Thresholding
+    elif (intVal == 4):
+        # Adaptive Thresholding
+        returnValue1, modifiedImage1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+        # last 2 parameters below: block size of neighbourhood and constant used
+        modifiedImage2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2) 
+        modifiedImage3 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
-    # elif (intVal == 2):
-    #     # Otsu's Method
+        modifiedImageArray = [img, modifiedImage1, modifiedImage2, modifiedImage3]
+        labelArray = ["Original Image", "Simple Thresholding", "Adaptive Mean Thresholding", "Adaptive Gaussian Thresholding"]
 
-    # elif (intVal == 2):
-    #     # Niblack Thresholding
+        numRows = 2
+        numColumns = 2
 
-    # elif (intVal == 2):
-    #     # Sauvola Thresholding
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
-    # else:
-    #     # should never execute
-    #     tellUser("Select an option...", labelUpdates)
+    elif (intVal == 5):
+        # Otsu's Method
 
+        # global thresholding
+        ret1,th1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+
+        # Otsu's thresholding
+        ret2,th2 = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        # Otsu's thresholding after Gaussian filtering
+        blur = cv2.GaussianBlur(img, (5, 5), 0)
+        ret3,th3 = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        # plot all the images and their histograms
+        modifiedImageArray = [img, th1, img, th2, blur, th3]
+        labelArray = ['Original Image','Global Thresholding (v=127)','Original Image',"Otsu's Thresholding",'Gaussian filtered Image',"Otsu's Thresholding"]
+
+        numRows = 3
+        numColumns = 3
+        
+        x = 0
+        for i in range(3):
+            x += 1
+            fig.add_subplot(numRows, numColumns, x)
+
+            plt.imshow(modifiedImageArray[i*2], cmap='gray')
+            plt.title(labelArray[i], wrap=True)
+            plt.axis('off') #Removes axes
+
+            x += 1
+            fig.add_subplot(numRows, numColumns, x)
+            plt.hist(modifiedImageArray[i*2].ravel(), 256)
+            plt.title("Histogram", wrap=True)
+
+            x += 1
+            fig.add_subplot(numRows, numColumns, x)
+            plt.imshow(modifiedImageArray[i + 1], cmap='gray')
+            plt.title(labelArray[i*2 +1], wrap=True)
+            plt.axis('off') #Removes axes
+
+        plt.tight_layout()
+        plt.show()
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+###
+
+# allows for any number of images to be placed in a grid
+def plotImagesSideBySide(fig, imgArray, imgName, labelArray, numRows, numColumns):
+    for i in range(len(imgArray)):
+        fig.add_subplot(numRows, numColumns, i+1)
+        plt.imshow(imgArray[i], cmap='gray')
+        plt.title(labelArray[i], wrap=True)
+        plt.axis('off') #Removes axes
+
+    plt.tight_layout()
+    plt.show()
+###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 

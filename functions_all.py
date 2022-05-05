@@ -1385,9 +1385,6 @@ def chooseEdgeDetectionMethod(intVal, img, imgName):
     Edge Based
     Search Based
     zero crossing
-    Region Based
-    Region growing
-    Region splitting and merging
     '''
 ###
 
@@ -1409,13 +1406,36 @@ def chooseClusteringMethod(intVal, img, imgName):
 
     '''
     K-means
-    Fuzzy C
-    Linear Iterative Clustering
+
+    more can be implemented if we discover them
     '''
+    clusteringWindow = Toplevel(window)
+    clusteringWindow.title("Choose a kind of clustering...")
+    clusteringWindow.geometry("300x300")
+
+    threshOption = IntVar()
+    threshOption.set(0)
+
+    Radiobutton(clusteringWindow, text="Iterative K-Means clustering", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
+    # Radiobutton(clusteringWindow, text="Fuzzy-C clustering", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
+    # Radiobutton(clusteringWindow, text="Linear Iterative clustering", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+
+    Button(clusteringWindow, text="Choose Segmentation Option", width=50, bg='gray',
+        command=lambda: executeClusteringChoice(intVal=threshOption.get(), img=img, imgName=imgName)
+    ).pack(anchor=W, side="top")
+    Button(clusteringWindow, text="Close Plots", width=50, bg='gray',
+        command=lambda: ( plt.close("Clustering Changes") )
+    ).pack(anchor=W, side="top")
+
 ###
 
 def chooseRegionBasedMethod(intVal, img, imgName):
     print("inside ChooseRegionBasedMethod")
+    '''
+    Region Based
+    Region growing
+    Region splitting and merging
+    '''
 ###
 
 def chooseThresholdingMethod(intVal, img, imgName):
@@ -1439,9 +1459,8 @@ def chooseThresholdingMethod(intVal, img, imgName):
 
     Radiobutton(thresholdingWindow, text="Simple Thresholding", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
     Radiobutton(thresholdingWindow, text="Iterative Thresholding", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
-    # Radiobutton(thresholdingWindow, text="Global Thresholding", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
-    Radiobutton(thresholdingWindow, text="Adaptive Thresholding", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
-    Radiobutton(thresholdingWindow, text="Otsu's Method", variable=threshOption, value=5, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Adaptive Thresholding", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Otsu's Method", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
 
     Button(thresholdingWindow, text="Choose Segmentation Option", width=50, bg='gray',
         command=lambda: executeThresholdingChoice(intVal=threshOption.get(), img=img, imgName=imgName)
@@ -1449,6 +1468,53 @@ def chooseThresholdingMethod(intVal, img, imgName):
     Button(thresholdingWindow, text="Close Plots", width=50, bg='gray',
         command=lambda: ( plt.close("Segmentation Changes") )
     ).pack(anchor=W, side="top")
+###
+
+def executeClusteringChoice(intVal, img, imgName):
+
+    fig = plt.figure(num="Clustering Changes", figsize=(10, 6))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1 # used in matplotlib function below
+    numColumns = 2 # used in matplotlib function below
+
+    if (intVal == 1):
+        # K-Means Clustering
+        twoDimage = img.reshape((-1,1)) # Transform into a 1D matrix
+        # print(twoDimage.shape)
+        # print(twoDimage[0])
+        twoDimage = np.float32(twoDimage) # float32 data type needed for this function
+        # print(twoDimage[0])
+
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+        attempts=10
+
+        modifiedImageArray = [img]
+        labelArray = ["Original Image"]
+        numRows = 2
+        numColumns = 2
+
+        for i in range(2, 5):
+            K = i
+
+            ret, label, center = cv2.kmeans(twoDimage, K, None, criteria, attempts, cv2.KMEANS_PP_CENTERS)
+            center = np.uint8(center)
+            res = center[label.flatten()]
+            result_image = res.reshape((img.shape))
+
+            modifiedImageArray.append(result_image)
+            labelArray.append("K-Means Clustering, Size=" + str(i))
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    # elif (intVal == 2):
+    #     #
+    
+    # elif (intVal == 3):
+    #     #
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+
 ###
 
 def executeThresholdingChoice(intVal, img, imgName):
@@ -1482,10 +1548,7 @@ def executeThresholdingChoice(intVal, img, imgName):
 
         plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
-    # elif (intVal == 3):
-    #     # Global Thresholding
-
-    elif (intVal == 4):
+    elif (intVal == 3):
         # Adaptive Thresholding
         returnValue1, modifiedImage1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
         # last 2 parameters below: block size of neighbourhood and constant used
@@ -1500,7 +1563,7 @@ def executeThresholdingChoice(intVal, img, imgName):
 
         plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
-    elif (intVal == 5):
+    elif (intVal == 4):
         # Otsu's Method
 
         # global thresholding

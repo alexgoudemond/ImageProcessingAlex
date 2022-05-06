@@ -1865,8 +1865,25 @@ def chooseMaliceOption():
 def executeMaliceChoice(intVal, img, imgName):
     print("Inside executeMaliceChoice")
 
-    # if (intVal == 1):
-    #     # Brighten an Image
+    fig = plt.figure(num="Malice Changes", figsize=(8, 4))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1 # used in matplotlib function below
+    numColumns = 2 # used in matplotlib function below
+
+    if (intVal == 1):
+        # Brighten an Image
+        (x, y) = img.shape
+        temp = 0
+        newImage = ( img + int(255 * 0.3) ) # 30% brighter #! works, but wraps values > 255 - How fix?
+        tempImage = newImage
+
+        # newImage[tempImage > 255] = 255
+
+        modifiedImageArray = [img, newImage]
+        labelArray = ["Original Image", "Brighter Image"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+        
 
     # elif (intVal == 2):
     #     # Darken an Image

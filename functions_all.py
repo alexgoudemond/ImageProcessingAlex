@@ -1324,7 +1324,7 @@ def chooseSegmentOption():
             command=lambda: executeSegmentOption(intVal=segmentOption.get(), img=imgGrayscale, imgName=window.filename)
         )
         B2 = Button(segmentWindow, text="Close Plots", width=50, bg='gray',
-            command=lambda: ( plt.close("Segmentation Changes") )
+            command=lambda: ( plt.close("Watershed Changes") )
         )
 
         # grid layout
@@ -1350,7 +1350,7 @@ def executeSegmentOption(intVal, img, imgName):
         # Edge Detection
         chooseEdgeDetectionMethod(intVal, img, imgName)
 
-    elif (intVal == 2):
+    elif (intVal == 3):
         # Watershed Method
         chooseWatershedMethod(intVal, img, imgName)
 
@@ -1404,7 +1404,53 @@ def chooseEdgeDetectionMethod(intVal, img, imgName):
 ###
 
 def chooseWatershedMethod(intVal, img, imgName):
-    print("inside ChooseWatershedMethod")
+    # print("inside ChooseWatershedMethod")
+
+    fig = plt.figure(num="Watershed Changes", figsize=(10, 6))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 3
+    numColumns = 3
+
+    # threshold
+    ret, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+    # noise removal
+    kernel = np.ones((3,3),np.uint8)
+    # print(kernel)
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations = 2)
+
+    # sure background area
+    sure_bg = cv2.dilate(opening, kernel, iterations=3)
+
+    # Finding sure foreground area
+    dist_transform = cv2.distanceTransform(opening, cv2.DIST_L2, 5)
+    ret, sure_fg = cv2.threshold(dist_transform, 0.7 * dist_transform.max(), 255, 0)
+
+    # Finding unknown region
+    unsure_pic = np.uint8(sure_fg)
+    unknown = cv2.subtract(sure_bg, unsure_pic)
+
+    # Marker labelling
+    ret, markers = cv2.connectedComponents(unsure_pic)
+
+    # Add one to all labels so that sure background is not 0, but 1
+    markers = markers + 1
+
+    # Now, mark the region of unknown with zero
+    markers[unknown==255] = 0
+
+    # NOW - Watershed method
+    watershedImage = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    finalMarkers = cv2.watershed(watershedImage, markers) #! needs colour image
+
+    watershedImage[finalMarkers == -1] = [255, 0, 0]
+    watershedImage = cv2.cvtColor(watershedImage, cv2.COLOR_BGR2GRAY) #! convert back to grayscale
+
+    modifiedImageArray = [img, thresh, opening, sure_bg, sure_fg, unknown, markers, watershedImage]
+    labelArray = ["Original Image", "Thresholded Image", "Morphological Opened Image", "Known Background (black)", "Known Foreground (white)", 
+                    "Unknown Aspects", "Unknown Aspects after Connecting Components (gray)", "Watershed Image"]
+
+    plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 ###
 
 def chooseClusteringMethod(intVal, img, imgName):

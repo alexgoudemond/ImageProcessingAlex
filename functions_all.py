@@ -1485,9 +1485,27 @@ def chooseRegionBasedMethod(intVal, img, imgName):
     print("inside ChooseRegionBasedMethod")
     '''
     Region Based
-    Region growing
-    Region splitting and merging
+    Region growing - implement later, big algorithm
+    Region splitting and merging - implement later, big algorithm
     '''
+
+    regionWindow = Toplevel(window)
+    regionWindow.title("Choose a kind of region...")
+    regionWindow.geometry("300x300")
+
+    option = IntVar()
+    option.set(0)
+
+    Radiobutton(regionWindow, text="Region Filling", variable=option, value=1, width=30).pack(anchor=W, side="top")
+    # Radiobutton(regionWindow, text="Region Growing", variable=option, value=2, width=30).pack(anchor=W, side="top")
+    # Radiobutton(regionWindow, text="Region Splitting and Merging", variable=option, value=3, width=30).pack(anchor=W, side="top")
+
+    Button(regionWindow, text="Choose Segmentation Option", width=50, bg='gray',
+        command=lambda: executeRegionChoice(intVal=option.get(), img=img, imgName=imgName)
+    ).pack(anchor=W, side="top")
+    Button(regionWindow, text="Close Plots", width=50, bg='gray',
+        command=lambda: ( plt.close("Region Based Changes") )
+    ).pack(anchor=W, side="top")
 ###
 
 def chooseThresholdingMethod(intVal, img, imgName):
@@ -1519,6 +1537,43 @@ def chooseThresholdingMethod(intVal, img, imgName):
     ).pack(anchor=W, side="top")
 ###
 
+def executeRegionChoice(intVal, img, imgName): 
+    print("Inside executeRegionChoice")
+
+    fig = plt.figure(num="Region Based Changes", figsize=(10, 6))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1
+    numColumns = 2
+
+    if (intVal == 1):
+        # region filling
+        from skimage.feature import canny
+        from scipy.ndimage import binary_fill_holes
+
+        numRows = 2
+        numColumns = 2
+
+        cannyImage = canny(img)
+        regionFilled = binary_fill_holes(cannyImage)
+
+        modifiedImageArray = [img, cannyImage, regionFilled]
+        labelArray = ["Original Image", "Canny Edge Detection", "Region Filled Image"]
+        
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    # elif (intVal == 2):
+    #     # region growing
+    #     # seperate algorithm to implement
+        
+    # elif (intVal == 3):
+    #     # Region Splitting and Merging
+    #     # seperate algorithm to implement
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+###
+
 def executeEdgeDetectionChoice(intVal, img, imgName):
 
     fig = plt.figure(num="Edge Detection Changes", figsize=(10, 6))
@@ -1532,7 +1587,6 @@ def executeEdgeDetectionChoice(intVal, img, imgName):
 
         modifiedImageArray = [img, edge]
         labelArray = ["Original Image", "Canny Edge Detection"]
-        
 
         plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 

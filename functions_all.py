@@ -28,6 +28,7 @@ import numpy as np
 import os # Path reading, File Writing and Deleting
 from matplotlib import pyplot  as plt
 from math import floor
+from skimage.segmentation import felzenszwalb # type of segmentation method
 
 # Global Vars below
 global window 
@@ -1286,10 +1287,543 @@ def applyLaplacianMask(img):
     return newImg, mask
 ###
     
+#------------------------------------------------------------------------------------Segmentation Functions Below---------------
+
+def chooseSegmentOption():
+    # print("Inside segmentation option")
+    window.filename = openGUI("Select an Image...")
+
+    imgGrayscale, success = getGray()
+
+    if (success):
+
+        # Open a window and show all the options to choose from
+
+        # segmentWindow = tk.Tk(baseName = "segment_Window")
+        segmentWindow = Toplevel(window)
+        segmentWindow.title("Choose a kind of segmentation...")
+        segmentWindow.geometry("500x200")
+
+        segmentOption = IntVar()
+        segmentOption.set(1)
+
+        # left side buttons
+        R1 = Radiobutton(segmentWindow, text="Edge Detection", variable=segmentOption, value=1, width=30)
+        R3 = Radiobutton(segmentWindow, text="Watershed Method", variable=segmentOption, value=3, width=30)
+
+        # right side buttons
+        R4 = Radiobutton(segmentWindow, text="Thresholding", variable=segmentOption, value=4, width=30)
+        R5 = Radiobutton(segmentWindow, text="Region Splitting and Merging", variable=segmentOption, value=5, width=30)
+        R6 = Radiobutton(segmentWindow, text="Clustering", variable=segmentOption, value=6, width=30)
+
+        # top labels
+        L1 = Label(segmentWindow, text="Discontinuity Options", width=30)
+        L2 = Label(segmentWindow, text="Continuity Options", width=30)
+
+        B1 = Button(segmentWindow, text="Choose Segmentation Option", width=50, bg='gray',
+            command=lambda: executeSegmentOption(intVal=segmentOption.get(), img=imgGrayscale, imgName=window.filename)
+        )
+        B2 = Button(segmentWindow, text="Close Plots", width=50, bg='gray',
+            command=lambda: ( plt.close("Watershed Changes") )
+        )
+
+        # grid layout
+        L1.grid(row=0, column=0)
+        L2.grid(row=0, column=2)
+        R1.grid(row=1, column=0)
+        R3.grid(row=2, column=0)
+        R4.grid(row=1, column=2)
+        R5.grid(row=2, column=2)
+        R6.grid(row=3, column=2)
+        B1.grid(columnspan=3)
+        B2.grid(columnspan=3)
+
+    else:
+        tellUser("Unable to Get Grayscale Image for Segmentation Window...", labelUpdates)
+    
+    return True
+###
+
+def executeSegmentOption(intVal, img, imgName):
+    # give the user more options based on their choice:
+    if (intVal == 1):
+        # Edge Detection
+        chooseEdgeDetectionMethod(intVal, img, imgName)
+
+    elif (intVal == 3):
+        # Watershed Method
+        chooseWatershedMethod(intVal, img, imgName)
+
+    elif (intVal == 4):
+        # Thresholding
+        chooseThresholdingMethod(intVal, img, imgName)
+
+    elif (intVal == 5):
+        # Region Splitting and Merging
+        chooseRegionBasedMethod(intVal, img, imgName)
+
+    elif (intVal == 6):
+        # Clustering
+        chooseClusteringMethod(intVal, img, imgName)
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+
+    # print("Inside executeSegmentOption()")  
+###
+
+def chooseEdgeDetectionMethod(intVal, img, imgName):
+    # print("inside ChooseEdgeDetectionMethod")
+
+    '''
+    Canny Edge Detection
+    Simple Contour
+    Complete Contour Detection
+    Felzenszwalb's Segmentation
+    '''
+    
+    edgeDetectionWindow = Toplevel(window)
+    edgeDetectionWindow.title("Choose a kind of edgeDetection...")
+    edgeDetectionWindow.geometry("300x300")
+
+    threshOption = IntVar()
+    threshOption.set(0)
+
+    Radiobutton(edgeDetectionWindow, text="Canny Edge Detection", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
+    Radiobutton(edgeDetectionWindow, text="Simple Contour Detection", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
+    Radiobutton(edgeDetectionWindow, text="Complete Contour Detection", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+    Radiobutton(edgeDetectionWindow, text="Felzenswalbs Contour Detection", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
+
+    Button(edgeDetectionWindow, text="Choose Segmentation Option", width=50, bg='gray',
+        command=lambda: executeEdgeDetectionChoice(intVal=threshOption.get(), img=img, imgName=imgName)
+    ).pack(anchor=W, side="top")
+    Button(edgeDetectionWindow, text="Close Plots", width=50, bg='gray',
+        command=lambda: ( plt.close("Edge Detection Changes") )
+    ).pack(anchor=W, side="top")
+###
+
+def chooseWatershedMethod(intVal, img, imgName):
+    # print("inside ChooseWatershedMethod")
+
+    fig = plt.figure(num="Watershed Changes", figsize=(10, 6))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 3
+    numColumns = 3
+
+    # threshold
+    ret, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+    # noise removal
+    kernel = np.ones((3,3),np.uint8)
+    # print(kernel)
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations = 2)
+
+    # sure background area
+    sure_bg = cv2.dilate(opening, kernel, iterations=3)
+
+    # Finding sure foreground area
+    dist_transform = cv2.distanceTransform(opening, cv2.DIST_L2, 5)
+    ret, sure_fg = cv2.threshold(dist_transform, 0.7 * dist_transform.max(), 255, 0)
+
+    # Finding unknown region
+    unsure_pic = np.uint8(sure_fg)
+    unknown = cv2.subtract(sure_bg, unsure_pic)
+
+    # Marker labelling
+    ret, markers = cv2.connectedComponents(unsure_pic)
+
+    # Add one to all labels so that sure background is not 0, but 1
+    markers = markers + 1
+
+    # Now, mark the region of unknown with zero
+    markers[unknown==255] = 0
+
+    # NOW - Watershed method
+    watershedImage = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    finalMarkers = cv2.watershed(watershedImage, markers) #! needs colour image
+
+    watershedImage[finalMarkers == -1] = [255, 0, 0]
+    watershedImage = cv2.cvtColor(watershedImage, cv2.COLOR_BGR2GRAY) #! convert back to grayscale
+
+    modifiedImageArray = [img, thresh, opening, sure_bg, sure_fg, unknown, markers, watershedImage]
+    labelArray = ["Original Image", "Thresholded Image", "Morphological Opened Image", "Known Background (black)", "Known Foreground (white)", 
+                    "Unknown Aspects", "Unknown Aspects after Connecting Components (gray)", "Watershed Image"]
+
+    plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+###
+
+def chooseClusteringMethod(intVal, img, imgName):
+    print("inside ChooseClusteringMethod")
+
+    '''
+    K-means
+
+    more can be implemented if we discover them
+    '''
+    clusteringWindow = Toplevel(window)
+    clusteringWindow.title("Choose a kind of clustering...")
+    clusteringWindow.geometry("300x300")
+
+    threshOption = IntVar()
+    threshOption.set(0)
+
+    Radiobutton(clusteringWindow, text="Iterative K-Means clustering", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
+    # Radiobutton(clusteringWindow, text="Fuzzy-C clustering", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
+    # Radiobutton(clusteringWindow, text="Linear Iterative clustering", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+
+    Button(clusteringWindow, text="Choose Segmentation Option", width=50, bg='gray',
+        command=lambda: executeClusteringChoice(intVal=threshOption.get(), img=img, imgName=imgName)
+    ).pack(anchor=W, side="top")
+    Button(clusteringWindow, text="Close Plots", width=50, bg='gray',
+        command=lambda: ( plt.close("Clustering Changes") )
+    ).pack(anchor=W, side="top")
+
+###
+
+def chooseRegionBasedMethod(intVal, img, imgName):
+    print("inside ChooseRegionBasedMethod")
+    '''
+    Region Based
+    Region growing - implement later, big algorithm
+    Region splitting and merging - implement later, big algorithm
+    '''
+
+    regionWindow = Toplevel(window)
+    regionWindow.title("Choose a kind of region...")
+    regionWindow.geometry("300x300")
+
+    option = IntVar()
+    option.set(0)
+
+    Radiobutton(regionWindow, text="Region Filling", variable=option, value=1, width=30).pack(anchor=W, side="top")
+    # Radiobutton(regionWindow, text="Region Growing", variable=option, value=2, width=30).pack(anchor=W, side="top")
+    # Radiobutton(regionWindow, text="Region Splitting and Merging", variable=option, value=3, width=30).pack(anchor=W, side="top")
+
+    Button(regionWindow, text="Choose Segmentation Option", width=50, bg='gray',
+        command=lambda: executeRegionChoice(intVal=option.get(), img=img, imgName=imgName)
+    ).pack(anchor=W, side="top")
+    Button(regionWindow, text="Close Plots", width=50, bg='gray',
+        command=lambda: ( plt.close("Region Based Changes") )
+    ).pack(anchor=W, side="top")
+###
+
+def chooseThresholdingMethod(intVal, img, imgName):
+    print("inside ChooseThresholdingMethod")
+    '''
+    Simple
+    Manual / Iterative Thresholding
+    Adaptive
+    Otsus method
+    '''
+
+    thresholdingWindow = Toplevel(window)
+    thresholdingWindow.title("Choose a kind of Thresholding...")
+    thresholdingWindow.geometry("300x300")
+
+    threshOption = IntVar()
+    threshOption.set(0)
+
+    Radiobutton(thresholdingWindow, text="Simple Thresholding", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Iterative Thresholding", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Adaptive Thresholding", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+    Radiobutton(thresholdingWindow, text="Otsu's Method", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
+
+    Button(thresholdingWindow, text="Choose Segmentation Option", width=50, bg='gray',
+        command=lambda: executeThresholdingChoice(intVal=threshOption.get(), img=img, imgName=imgName)
+    ).pack(anchor=W, side="top")
+    Button(thresholdingWindow, text="Close Plots", width=50, bg='gray',
+        command=lambda: ( plt.close("Segmentation Changes") )
+    ).pack(anchor=W, side="top")
+###
+
+def executeRegionChoice(intVal, img, imgName): 
+    print("Inside executeRegionChoice")
+
+    fig = plt.figure(num="Region Based Changes", figsize=(10, 6))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1
+    numColumns = 2
+
+    if (intVal == 1):
+        # region filling
+        from skimage.feature import canny
+        from scipy.ndimage import binary_fill_holes
+
+        numRows = 2
+        numColumns = 2
+
+        cannyImage = canny(img)
+        regionFilled = binary_fill_holes(cannyImage)
+
+        modifiedImageArray = [img, cannyImage, regionFilled]
+        labelArray = ["Original Image", "Canny Edge Detection", "Region Filled Image"]
+        
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    # elif (intVal == 2):
+    #     # region growing
+    #     # seperate algorithm to implement
+        
+    # elif (intVal == 3):
+    #     # Region Splitting and Merging
+    #     # seperate algorithm to implement
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+###
+
+def executeEdgeDetectionChoice(intVal, img, imgName):
+
+    fig = plt.figure(num="Edge Detection Changes", figsize=(10, 6))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1
+    numColumns = 2
+
+    if (intVal == 1):
+        # Canny Edge Detection
+        edge = cv2.Canny(img,100,200)
+
+        modifiedImageArray = [img, edge]
+        labelArray = ["Original Image", "Canny Edge Detection"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 2):
+        # Simple Contour
+        numRows = 3
+        numColumns = 2
+
+        (x, y) = img.shape
+        resizedImg = cv2.resize(img,(256,256))
+        # Compute the threshold of the grayscale image
+        value1 , threshImg = cv2.threshold(resizedImg, np.mean(resizedImg), 255, cv2.THRESH_BINARY_INV)
+        # canny edge detection
+        cannyImg = cv2.Canny(threshImg, 0,255)
+        # dilate edges detected.
+        edges = cv2.dilate(cannyImg, None)
+
+        modifiedImage = cv2.resize(edges, (y, x)) # resize
+
+        modifiedImageArray = [img, resizedImg, threshImg, cannyImg, edges, modifiedImage]
+        labelArray = ["Original Image", "Resized Image", "Thresholded Image", "Canny Edges of Thresholded Image", "Dilated Edges", "Restore Sizes"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 3):
+        # Complete Contour
+        numRows = 4
+        numColumns = 2
+
+        (x, y) = img.shape
+        resizedImg = cv2.resize(img,(256,256))
+
+        # Compute the threshold of the grayscale image
+        value1 , threshImg = cv2.threshold(resizedImg, np.mean(resizedImg), 255, cv2.THRESH_BINARY_INV)
+
+        # canny edge detection
+        cannyImg = cv2.Canny(threshImg, 0,255)
+
+        # dilate edges detected.
+        edges = cv2.dilate(cannyImg, None)
+
+        # find all the open/closed regions in the image and store (cnt). (-1 subscript since the function returns a two-element tuple)
+        # The - pass them through the sorted function to access the largest contours first.
+        cnt = sorted(cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2], key=cv2.contourArea)[-1]
+
+        # Create a zero pixel mask that has equal shape and size to the original image.
+        mask = np.zeros((256,256), np.uint8)
+
+        # Draw the detected contours on the created mask.
+        masked = cv2.drawContours(mask, [cnt], -1, 255, -1)
+
+        # bitwise AND operation on the original image (img) and the mask
+        dst = cv2.bitwise_and(resizedImg, resizedImg, mask=mask)
+        
+        modifiedImage = cv2.resize(dst, (y, x)) # resize
+
+        modifiedImageArray = [img, resizedImg, threshImg, cannyImg, edges, masked, dst, modifiedImage]
+        labelArray = ["Original Image", "Resized Image", "Thresholded Image", "Canny Edges of Thresholded Image", 
+                        "Dilated Edges", "Image after mask", "Image Contours Detected", "resized Image"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
 
+    elif (intVal == 4):
+        # Felzenszwalb's Segmentation
+        numRows = 2
+        numColumns = 2
 
+        # from skimage.segmentation import felzenszwalb
 
+        res1 = felzenszwalb(img, scale=50)
+        res2 = felzenszwalb(img, scale=100)
+
+        modifiedImageArray = [img, res1, res2]
+        labelArray = ["Original Image", "Felzenswalb Image, Scale=50", "Felzenswalb Image, Scale=100"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+###
+
+def executeClusteringChoice(intVal, img, imgName):
+
+    fig = plt.figure(num="Clustering Changes", figsize=(10, 6))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1 # used in matplotlib function below
+    numColumns = 2 # used in matplotlib function below
+
+    if (intVal == 1):
+        # K-Means Clustering
+        twoDimage = img.reshape((-1,1)) # Transform into a 1D matrix
+        # print(twoDimage.shape)
+        # print(twoDimage[0])
+        twoDimage = np.float32(twoDimage) # float32 data type needed for this function
+        # print(twoDimage[0])
+
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+        attempts=10
+
+        modifiedImageArray = [img]
+        labelArray = ["Original Image"]
+        numRows = 2
+        numColumns = 2
+
+        for i in range(2, 5):
+            K = i
+
+            ret, label, center = cv2.kmeans(twoDimage, K, None, criteria, attempts, cv2.KMEANS_PP_CENTERS)
+            center = np.uint8(center)
+            res = center[label.flatten()]
+            result_image = res.reshape((img.shape))
+
+            modifiedImageArray.append(result_image)
+            labelArray.append("K-Means Clustering, Size=" + str(i))
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    # elif (intVal == 2):
+    #     #
+
+    # elif (intVal == 3):
+    #     #
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+
+###
+
+def executeThresholdingChoice(intVal, img, imgName):
+    # print("Inside executeThresholdingChoice()")
+
+    fig = plt.figure(num="Segmentation Changes", figsize=(8, 4))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1 # used in matplotlib function below
+    numColumns = 2 # used in matplotlib function below
+
+    # 7 choices
+    if (intVal == 1):
+        # Simple 
+        returnValue, modifiedImage = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+        modifiedImageArray = [img, modifiedImage]
+        labelArray = ["Original Image", "Simple Thresholding"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 2):
+        # Iterative Thresholding
+        modifiedImageArray = [img]
+        labelArray = ["Original Image"]
+        numRows = 3
+        numColumns = 2
+
+        for i in range(2, 6):
+            returnValue, modifiedImage = cv2.threshold(img, (255 // i), 255, cv2.THRESH_BINARY)
+            modifiedImageArray.append(modifiedImage)
+            labelArray.append("Simple Thresholding using \'" + str(255 // i) + "\'")
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 3):
+        # Adaptive Thresholding
+        returnValue1, modifiedImage1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+        # last 2 parameters below: block size of neighbourhood and constant used
+        modifiedImage2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2) 
+        modifiedImage3 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+
+        modifiedImageArray = [img, modifiedImage1, modifiedImage2, modifiedImage3]
+        labelArray = ["Original Image", "Simple Thresholding", "Adaptive Mean Thresholding", "Adaptive Gaussian Thresholding"]
+
+        numRows = 2
+        numColumns = 2
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 4):
+        # Otsu's Method
+
+        # global thresholding
+        ret1,th1 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+
+        # Otsu's thresholding
+        ret2,th2 = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        # Otsu's thresholding after Gaussian filtering
+        blur = cv2.GaussianBlur(img, (5, 5), 0)
+        ret3,th3 = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        # plot all the images and their histograms
+        modifiedImageArray = [img, th1, img, th2, blur, th3]
+        labelArray = ['Original Image','Global Thresholding (v=127)','Original Image',"Otsu's Thresholding",'Gaussian filtered Image',"Otsu's Thresholding"]
+
+        numRows = 3
+        numColumns = 3
+        
+        x = 0
+        for i in range(3):
+            x += 1
+            fig.add_subplot(numRows, numColumns, x)
+
+            plt.imshow(modifiedImageArray[i*2], cmap='gray')
+            plt.title(labelArray[i], wrap=True)
+            plt.axis('off') #Removes axes
+
+            x += 1
+            fig.add_subplot(numRows, numColumns, x)
+            plt.hist(modifiedImageArray[i*2].ravel(), 256)
+            plt.title("Histogram", wrap=True)
+
+            x += 1
+            fig.add_subplot(numRows, numColumns, x)
+            plt.imshow(modifiedImageArray[i + 1], cmap='gray')
+            plt.title(labelArray[i*2 +1], wrap=True)
+            plt.axis('off') #Removes axes
+
+        plt.tight_layout()
+        plt.show()
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+###
+
+# allows for any number of images to be placed in a grid
+def plotImagesSideBySide(fig, imgArray, imgName, labelArray, numRows, numColumns):
+    for i in range(len(imgArray)):
+        fig.add_subplot(numRows, numColumns, i+1)
+        plt.imshow(imgArray[i], cmap='gray')
+        plt.title(labelArray[i], wrap=True)
+        plt.axis('off') #Removes axes
+
+    plt.tight_layout()
+    plt.show()
+
+    tellUser("Changes displayed...", labelUpdates)
+###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 

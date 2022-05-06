@@ -42,7 +42,7 @@ Create a folder called Images in the same directory as this and place Pics
 #----------------------------------------------------------------------------------------------------------------Packages Below
 # Encapsulating functions from our dedicated functions file
 from cv2 import resize
-from functions_all import   (chooseEnhancement, chooseMorphologyOption, chooseSharpeningOption, chooseSmoothingOption, 
+from functions_all import   (chooseEnhancement, chooseMorphologyOption, chooseSegmentOption, chooseSharpeningOption, chooseSmoothingOption, 
                             openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues,
                             chooseMaskOption)
 # global Vars to use
@@ -156,12 +156,13 @@ buttonMasks = tk.Button(
     bg = "silver",
     command = chooseMaskOption
 )
-button10 = tk.Button(
+buttonSegmentation = tk.Button(
     master = buttonFrameMiddle,
-    text = "10",
+    text = "Segment an Image",
     width = 25,
     height = 5, 
     bg = "silver",
+    command = chooseSegmentOption
 )
 button11 = tk.Button(
     master = buttonFrameBottom,
@@ -217,12 +218,11 @@ buttonIntensityValues.pack(side = tk.LEFT)
 buttonEnhance.pack(side = tk.LEFT)
 buttonAllIntensityValues.pack(side = tk.RIGHT)
 
-
 buttonSmooth.pack(side = tk.LEFT)
 buttonSharpen.pack(side = tk.LEFT)
 buttonMorphology.pack(side = tk.LEFT)
 buttonMasks.pack(side = tk.LEFT)
-button10.pack(side = tk.RIGHT)
+buttonSegmentation.pack(side = tk.RIGHT)
 
 button11.pack(side = tk.LEFT)
 button12.pack(side = tk.LEFT)

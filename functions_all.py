@@ -1825,6 +1825,11 @@ def plotImagesSideBySide(fig, imgArray, imgName, labelArray, numRows, numColumns
     tellUser("Changes displayed...", labelUpdates)
 ###
 
+#------------------------------------------------------------------------------------Malice Functions Below---------------------
+
+def chooseMaliceOption():
+    print("Inside chooseMaliceOption()")
+
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 
 # places updated label for user

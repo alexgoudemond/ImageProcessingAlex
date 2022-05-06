@@ -28,6 +28,7 @@ import numpy as np
 import os # Path reading, File Writing and Deleting
 from matplotlib import pyplot  as plt
 from math import floor
+from skimage.segmentation import felzenszwalb # type of segmentation method
 
 # Global Vars below
 global window 
@@ -1308,7 +1309,6 @@ def chooseSegmentOption():
 
         # left side buttons
         R1 = Radiobutton(segmentWindow, text="Edge Detection", variable=segmentOption, value=1, width=30)
-        R2 = Radiobutton(segmentWindow, text="Contour Detection", variable=segmentOption, value=2, width=30)
         R3 = Radiobutton(segmentWindow, text="Watershed Method", variable=segmentOption, value=3, width=30)
 
         # right side buttons
@@ -1331,8 +1331,7 @@ def chooseSegmentOption():
         L1.grid(row=0, column=0)
         L2.grid(row=0, column=2)
         R1.grid(row=1, column=0)
-        R2.grid(row=2, column=0)
-        R3.grid(row=3, column=0)
+        R3.grid(row=2, column=0)
         R4.grid(row=1, column=2)
         R5.grid(row=2, column=2)
         R6.grid(row=3, column=2)
@@ -1352,10 +1351,6 @@ def executeSegmentOption(intVal, img, imgName):
         chooseEdgeDetectionMethod(intVal, img, imgName)
 
     elif (intVal == 2):
-        # Contour Detection
-        chooseContourMethod(intVal, img, imgName)
-
-    elif (intVal == 3):
         # Watershed Method
         chooseWatershedMethod(intVal, img, imgName)
 
@@ -1379,14 +1374,15 @@ def executeSegmentOption(intVal, img, imgName):
 ###
 
 def chooseEdgeDetectionMethod(intVal, img, imgName):
-    print("inside ChooseEdgeDetectionMethod")
+    # print("inside ChooseEdgeDetectionMethod")
 
     '''
     Canny Edge Detection
-    Edge Based
-    Search Based
-    zero crossing
+    Simple Contour
+    Complete Contour Detection
+    Felzenszwalb's Segmentation
     '''
+    
     edgeDetectionWindow = Toplevel(window)
     edgeDetectionWindow.title("Choose a kind of edgeDetection...")
     edgeDetectionWindow.geometry("300x300")
@@ -1395,9 +1391,9 @@ def chooseEdgeDetectionMethod(intVal, img, imgName):
     threshOption.set(0)
 
     Radiobutton(edgeDetectionWindow, text="Canny Edge Detection", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
-    Radiobutton(edgeDetectionWindow, text="Edge Based Edge Detection", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
-    Radiobutton(edgeDetectionWindow, text="Search Based Edge Detection", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
-    Radiobutton(edgeDetectionWindow, text="Zero Crossing Edge Detection", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
+    Radiobutton(edgeDetectionWindow, text="Simple Contour Detection", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
+    Radiobutton(edgeDetectionWindow, text="Complete Contour Detection", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+    Radiobutton(edgeDetectionWindow, text="Felzenswalbs Contour Detection", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
 
     Button(edgeDetectionWindow, text="Choose Segmentation Option", width=50, bg='gray',
         command=lambda: executeEdgeDetectionChoice(intVal=threshOption.get(), img=img, imgName=imgName)
@@ -1405,15 +1401,6 @@ def chooseEdgeDetectionMethod(intVal, img, imgName):
     Button(edgeDetectionWindow, text="Close Plots", width=50, bg='gray',
         command=lambda: ( plt.close("Edge Detection Changes") )
     ).pack(anchor=W, side="top")
-###
-
-def chooseContourMethod(intVal, img, imgName):
-    print("inside ChooseContourMethod")
-    '''
-    Active Contour
-    Mark Boundaries
-    Felzenszwalb's Segmentation
-    '''
 ###
 
 def chooseWatershedMethod(intVal, img, imgName):
@@ -1487,10 +1474,11 @@ def chooseThresholdingMethod(intVal, img, imgName):
 ###
 
 def executeEdgeDetectionChoice(intVal, img, imgName):
-    # room for more choices
-    
+
     fig = plt.figure(num="Edge Detection Changes", figsize=(10, 6))
     plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1
+    numColumns = 2
 
     if (intVal == 1):
         # Canny Edge Detection
@@ -1498,19 +1486,84 @@ def executeEdgeDetectionChoice(intVal, img, imgName):
 
         modifiedImageArray = [img, edge]
         labelArray = ["Original Image", "Canny Edge Detection"]
-        numRows = 2
-        numColumns = 2
+        
 
         plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
-    # elif (intVal == 2):
-    #     # Edge Based
+    elif (intVal == 2):
+        # Simple Contour
+        numRows = 3
+        numColumns = 2
 
-    # elif (intVal == 3):
-    #     # Search Based
+        (x, y) = img.shape
+        resizedImg = cv2.resize(img,(256,256))
+        # Compute the threshold of the grayscale image
+        value1 , threshImg = cv2.threshold(resizedImg, np.mean(resizedImg), 255, cv2.THRESH_BINARY_INV)
+        # canny edge detection
+        cannyImg = cv2.Canny(threshImg, 0,255)
+        # dilate edges detected.
+        edges = cv2.dilate(cannyImg, None)
 
-    # elif (intVal == 4):
-    #     # zero crossing
+        modifiedImage = cv2.resize(edges, (y, x)) # resize
+
+        modifiedImageArray = [img, resizedImg, threshImg, cannyImg, edges, modifiedImage]
+        labelArray = ["Original Image", "Resized Image", "Thresholded Image", "Canny Edges of Thresholded Image", "Dilated Edges", "Restore Sizes"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 3):
+        # Complete Contour
+        numRows = 4
+        numColumns = 2
+
+        (x, y) = img.shape
+        resizedImg = cv2.resize(img,(256,256))
+
+        # Compute the threshold of the grayscale image
+        value1 , threshImg = cv2.threshold(resizedImg, np.mean(resizedImg), 255, cv2.THRESH_BINARY_INV)
+
+        # canny edge detection
+        cannyImg = cv2.Canny(threshImg, 0,255)
+
+        # dilate edges detected.
+        edges = cv2.dilate(cannyImg, None)
+
+        # find all the open/closed regions in the image and store (cnt). (-1 subscript since the function returns a two-element tuple)
+        # The - pass them through the sorted function to access the largest contours first.
+        cnt = sorted(cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2], key=cv2.contourArea)[-1]
+
+        # Create a zero pixel mask that has equal shape and size to the original image.
+        mask = np.zeros((256,256), np.uint8)
+
+        # Draw the detected contours on the created mask.
+        masked = cv2.drawContours(mask, [cnt], -1, 255, -1)
+
+        # bitwise AND operation on the original image (img) and the mask
+        dst = cv2.bitwise_and(resizedImg, resizedImg, mask=mask)
+        
+        modifiedImage = cv2.resize(dst, (y, x)) # resize
+
+        modifiedImageArray = [img, resizedImg, threshImg, cannyImg, edges, masked, dst, modifiedImage]
+        labelArray = ["Original Image", "Resized Image", "Thresholded Image", "Canny Edges of Thresholded Image", 
+                        "Dilated Edges", "Image after mask", "Image Contours Detected", "resized Image"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+
+    elif (intVal == 4):
+        # Felzenszwalb's Segmentation
+        numRows = 2
+        numColumns = 2
+
+        # from skimage.segmentation import felzenszwalb
+
+        res1 = felzenszwalb(img, scale=50)
+        res2 = felzenszwalb(img, scale=100)
+
+        modifiedImageArray = [img, res1, res2]
+        labelArray = ["Original Image", "Felzenswalb Image, Scale=50", "Felzenswalb Image, Scale=100"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
     else:
         # should never execute
@@ -1668,6 +1721,8 @@ def plotImagesSideBySide(fig, imgArray, imgName, labelArray, numRows, numColumns
 
     plt.tight_layout()
     plt.show()
+
+    tellUser("Changes displayed...", labelUpdates)
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

@@ -1830,6 +1830,67 @@ def plotImagesSideBySide(fig, imgArray, imgName, labelArray, numRows, numColumns
 def chooseMaliceOption():
     print("Inside chooseMaliceOption()")
 
+    window.filename = openGUI("Select an Image...")
+
+    imgGrayscale, success = getGray()
+
+    if (success):
+        maliceWindow = Toplevel(window)
+        maliceWindow.title("Choose a kind of malice...")
+        maliceWindow.geometry("300x300")
+
+        threshOption = IntVar()
+        threshOption.set(0)
+
+        Radiobutton(maliceWindow, text="Brighten an Image", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
+        Radiobutton(maliceWindow, text="Darken an Image", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
+        Radiobutton(maliceWindow, text="Inject Noise", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+        Radiobutton(maliceWindow, text="Invert Vertically", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
+        Radiobutton(maliceWindow, text="Invert Horizontally", variable=threshOption, value=5, width=30).pack(anchor=W, side="top")
+        Radiobutton(maliceWindow, text="Invert Diagonally", variable=threshOption, value=6, width=30).pack(anchor=W, side="top")
+        Radiobutton(maliceWindow, text="Rotate +45 Degrees", variable=threshOption, value=7, width=30).pack(anchor=W, side="top")
+
+        Button(maliceWindow, text="Choose Segmentation Option", width=50, bg='gray',
+            command=lambda: executeMaliceChoice(intVal=threshOption.get(), img=imgGrayscale, imgName=window.filename)
+        ).pack(anchor=W, side="top")
+        Button(maliceWindow, text="Close Plots", width=50, bg='gray',
+            command=lambda: ( plt.close("Malice Changes") )
+        ).pack(anchor=W, side="top")
+    else:
+        tellUser("Unable to Get Grayscale Image for Malice Window...", labelUpdates)
+    
+    return True
+###
+
+def executeMaliceChoice(intVal, img, imgName):
+    print("Inside executeMaliceChoice")
+
+    # if (intVal == 1):
+    #     # Brighten an Image
+
+    # elif (intVal == 2):
+    #     # Darken an Image
+
+    # elif (intVal == 3):
+    #     # Inject Noise
+
+    # elif (intVal == 4):
+    #     # Invert Vertically
+
+    # elif (intVal == 5):
+    #     # Invert Horizontally
+
+    # elif (intVal == 6):
+    #     # Invert Diagonally
+
+    # elif (intVal == 7):
+    #     # Rotate +45 Degrees
+
+    # else:
+    #     # should never execute
+    #     tellUser("Select an option...", labelUpdates)
+
+
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 
 # places updated label for user

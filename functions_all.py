@@ -29,6 +29,8 @@ import os # Path reading, File Writing and Deleting
 from matplotlib import pyplot  as plt
 from math import floor
 from skimage.segmentation import felzenszwalb # type of segmentation method
+from skimage.util import random_noise # several noise options
+from PIL import Image
 
 # Global Vars below
 global window 
@@ -1828,7 +1830,7 @@ def plotImagesSideBySide(fig, imgArray, imgName, labelArray, numRows, numColumns
 #------------------------------------------------------------------------------------Malice Functions Below---------------------
 
 def chooseMaliceOption():
-    print("Inside chooseMaliceOption()")
+    # print("Inside chooseMaliceOption()")
 
     window.filename = openGUI("Select an Image...")
 
@@ -1845,10 +1847,10 @@ def chooseMaliceOption():
         Radiobutton(maliceWindow, text="Brighten an Image", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
         Radiobutton(maliceWindow, text="Darken an Image", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
         Radiobutton(maliceWindow, text="Inject Noise", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
-        Radiobutton(maliceWindow, text="Invert Vertically", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
-        Radiobutton(maliceWindow, text="Invert Horizontally", variable=threshOption, value=5, width=30).pack(anchor=W, side="top")
-        Radiobutton(maliceWindow, text="Invert Diagonally", variable=threshOption, value=6, width=30).pack(anchor=W, side="top")
-        Radiobutton(maliceWindow, text="Rotate +45 Degrees", variable=threshOption, value=7, width=30).pack(anchor=W, side="top")
+        Radiobutton(maliceWindow, text="Flip Vertically", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
+        Radiobutton(maliceWindow, text="Flip Horizontally", variable=threshOption, value=5, width=30).pack(anchor=W, side="top")
+        Radiobutton(maliceWindow, text="Flip Diagonally", variable=threshOption, value=6, width=30).pack(anchor=W, side="top")
+        Radiobutton(maliceWindow, text="Rotate +90 Degrees", variable=threshOption, value=7, width=30).pack(anchor=W, side="top")
 
         Button(maliceWindow, text="Choose Segmentation Option", width=50, bg='gray',
             command=lambda: executeMaliceChoice(intVal=threshOption.get(), img=imgGrayscale, imgName=window.filename)
@@ -1863,7 +1865,7 @@ def chooseMaliceOption():
 ###
 
 def executeMaliceChoice(intVal, img, imgName):
-    print("Inside executeMaliceChoice")
+    # print("Inside executeMaliceChoice")
 
     fig = plt.figure(num="Malice Changes", figsize=(8, 4))
     plt.clf() # Should clear last plot but keep window open? 
@@ -1872,12 +1874,15 @@ def executeMaliceChoice(intVal, img, imgName):
 
     if (intVal == 1):
         # Brighten an Image
-        (x, y) = img.shape
-        temp = 0
-        newImage = ( img + int(255 * 0.3) ) # 30% brighter #! works, but wraps values > 255 - How fix?
-        tempImage = newImage
 
-        # newImage[tempImage > 255] = 255
+        tempImage = img # make a copy of intensity values before modification
+
+        # notation is a shorthand to bulk change all values!
+        newImage = ( img + int(255 * 0.3) ) # 30% brighter 
+        
+        # notation is a shorthand to bulk change all values!
+        # (240 + 76 == 316 --> 61) --> This wrapping happens with this shorthand, so we need to reset the bright points! 
+        newImage[tempImage > int(255 * 0.7)] = 255
 
         modifiedImageArray = [img, newImage]
         labelArray = ["Original Image", "Brighter Image"]
@@ -1885,27 +1890,96 @@ def executeMaliceChoice(intVal, img, imgName):
         plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
         
 
-    # elif (intVal == 2):
-    #     # Darken an Image
+    elif (intVal == 2):
+        # Darken an Image
+        tempImage = img # make a copy of intensity values before modification
 
-    # elif (intVal == 3):
-    #     # Inject Noise
+        # notation is a shorthand to bulk change all values!
+        newImage = ( img - int(255 * 0.3) ) # 30% darker
+        
+        # notation is a shorthand to bulk change all values!
+        # (12 - 76 == -64 --> 191) --> This wrapping happens with this shorthand, so we need to reset the dark points! 
+        newImage[tempImage < int(255 * 0.3)] = 0
 
-    # elif (intVal == 4):
-    #     # Invert Vertically
+        modifiedImageArray = [img, newImage]
+        labelArray = ["Original Image", "Darker Image"]
 
-    # elif (intVal == 5):
-    #     # Invert Horizontally
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
-    # elif (intVal == 6):
-    #     # Invert Diagonally
+    elif (intVal == 3):
+        # Inject Noise
+        
+        numRows = 3
+        numColumns = 3
 
-    # elif (intVal == 7):
-    #     # Rotate +45 Degrees
+        # convert PIL Image to ndarray
+        img_arr = np.asarray(img)
 
-    # else:
-    #     # should never execute
-    #     tellUser("Select an option...", labelUpdates)
+        # random_noise() method will convert image in [0, 255] to [0, 1.0],
+        
+        gauss_noise = random_noise(img_arr, mode='gaussian')
+        gauss_noise = (255 * gauss_noise)
+
+        salt_pepper_noise = random_noise(img_arr, mode='s&p') # salt and pepper
+        salt_pepper_noise = (255 * salt_pepper_noise)
+
+        poisson_noise = random_noise(img_arr, mode='poisson')
+        poisson_noise = (255 * poisson_noise)
+
+        speckle_noise = random_noise(img_arr, mode='speckle')
+        speckle_noise = (255 * speckle_noise)
+
+        gauss_img = Image.fromarray(gauss_noise)
+        salt_pepper_img = Image.fromarray(salt_pepper_noise)
+        poisson_img = Image.fromarray(poisson_noise)
+        speckle_img = Image.fromarray(speckle_noise)
+
+        modifiedImageArray = [img, gauss_img, salt_pepper_img, poisson_img, speckle_img]
+        labelArray = ["Original Image", "Gaussian Noise", "Salt and Pepper Noise", "Poisson Noise", "Speckle Noise"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+        
+
+    elif (intVal == 4):
+        # Flip Vertically
+        img_flip_ud = cv2.flip(img, 0)
+
+        modifiedImageArray = [img, img_flip_ud]
+        labelArray = ["Original Image", "Flipped Vertically"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 5):
+        # Flip Horizontally
+        img_flip_lr = cv2.flip(img, 1)
+
+        modifiedImageArray = [img, img_flip_lr]
+        labelArray = ["Original Image", "Flipped Horizontally"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 6):
+        # Flip Diagonally
+        img_flip_diag = cv2.flip(img, 0)
+        img_flip_diag = cv2.flip(img_flip_diag, 1)
+
+        modifiedImageArray = [img, img_flip_diag]
+        labelArray = ["Original Image", "Flipped Diagonally"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 7):
+        # Rotate +90 Degrees
+        img_rotated = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+
+        modifiedImageArray = [img, img_rotated]
+        labelArray = ["Original Image", "Rotated Image"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
 
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

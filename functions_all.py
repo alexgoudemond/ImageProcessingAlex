@@ -1909,7 +1909,7 @@ def executeMaliceChoice(intVal, img, imgName):
     elif (intVal == 3):
         # Inject Noise
         
-        numRows = 3
+        numRows = 2
         numColumns = 3
 
         # convert PIL Image to ndarray

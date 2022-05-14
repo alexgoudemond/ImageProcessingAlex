@@ -30,6 +30,7 @@ from matplotlib import pyplot  as plt
 from math import floor
 from skimage.segmentation import felzenszwalb # type of segmentation method
 from skimage.util import random_noise # several noise options
+from skimage import img_as_bool, morphology # Skeleton Code
 from PIL import Image
 
 # Global Vars below
@@ -1997,17 +1998,15 @@ def chooseFeatureRepresentationOption():
         featureRepWindow.title("Choose a kind of malice...")
         featureRepWindow.geometry("300x300")
 
-        threshOption = IntVar()
-        threshOption.set(0)
+        featRepOption = IntVar()
+        featRepOption.set(0)
 
-        Radiobutton(featureRepWindow, text="Get Toplogical Descriptors", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
-        Radiobutton(featureRepWindow, text="Get Regional Descriptors", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
-        Radiobutton(featureRepWindow, text="Get Skeleton", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
-        Radiobutton(featureRepWindow, text="Get Co-Occurence Matrix", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
-        Radiobutton(featureRepWindow, text="Get Haralick Features", variable=threshOption, value=5, width=30).pack(anchor=W, side="top")
+        Radiobutton(featureRepWindow, text="Get Skeleton", variable=featRepOption, value=1, width=30).pack(anchor=W, side="top")
+        Radiobutton(featureRepWindow, text="Get Co-Occurence Matrix", variable=featRepOption, value=2, width=30).pack(anchor=W, side="top")
+        Radiobutton(featureRepWindow, text="Get Haralick Features", variable=featRepOption, value=3, width=30).pack(anchor=W, side="top")
 
         Button(featureRepWindow, text="Choose Segmentation Option", width=50, bg='gray',
-            # command=lambda: executeFeatureRepresntationChoice(intVal=threshOption.get(), img=imgGrayscale, imgName=window.filename)
+            command=lambda: executeFeatureRepresentationChoice(intVal=featRepOption.get(), img=imgGrayscale, imgName=window.filename)
         ).pack(anchor=W, side="top")
         Button(featureRepWindow, text="Close Plots", width=50, bg='gray',
             command=lambda: ( plt.close("Feature Representation Changes") )
@@ -2016,6 +2015,39 @@ def chooseFeatureRepresentationOption():
         tellUser("Unable to Get Grayscale Image for Feature Representation Window...", labelUpdates)
     
     return True
+###
+
+def executeFeatureRepresentationChoice(intVal, img, imgName):
+    print("Inside executeFeatureRepresentationChoice()")
+
+    fig = plt.figure(num="Feature Representation Changes", figsize=(8, 4))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1 # used in matplotlib function below
+    numColumns = 2 # used in matplotlib function below
+
+    if (intVal == 1):
+        # get skeleton
+
+        imageBoolean = img_as_bool(img)
+        skel = morphology.medial_axis(imageBoolean)
+
+        modifiedImageArray = [img, skel]
+        labelArray = ["Original Image", "Skeleton"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+        
+    # elif (intVal == 2):
+    #     ###
+    # elif (intVal == 2):
+    #     ###
+    # elif (intVal == 2):
+    #     ###
+    # elif (intVal == 2):
+    #     ###
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 

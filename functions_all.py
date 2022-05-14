@@ -31,7 +31,7 @@ from math import floor
 from skimage.segmentation import felzenszwalb # type of segmentation method
 from skimage.util import random_noise # several noise options
 from skimage import img_as_bool, morphology # Skeleton Code
-from skimage.feature import graycomatrix # Co-Occurence Matrix
+from skimage.feature import graycomatrix, graycoprops # Co-Occurence Matrix and Haralick Features
 from PIL import Image
 
 # Global Vars below
@@ -2049,10 +2049,9 @@ def executeFeatureRepresentationChoice(intVal, img, imgName):
         # print(glcm[:, :, 0, 0])
 
         glcm = graycomatrix(np.array(img), distances=[1], angles=[0, np.pi/4, np.pi/2, 3*np.pi/4], levels=256)
-        (x, y) = img.shape
 
         # [:, :, 0, 0] --> [i, j, d, theta] ; in other words, d==distance away==0, theta==angle==0
-        print(glcm[:, :, 0, 0])
+        # print(glcm[:, :, 0, 0])
 
         currentDir = os.getcwd()
         path = currentDir + "\Images\Reports"
@@ -2077,12 +2076,30 @@ def executeFeatureRepresentationChoice(intVal, img, imgName):
         else:
             tellUser("Unable to create file")
 
-    # elif (intVal == 2):
-    #     ###
-    # elif (intVal == 2):
-    #     ###
-    # elif (intVal == 2):
-    #     ###
+    elif (intVal == 3):
+        # Get Haralick Features
+
+        # Test
+        # arr = [ [0, 0, 1, 1],
+        #         [0, 0, 1, 1],
+        #         [0, 2, 2, 2],
+        #         [2, 2, 3, 3] ]
+        # glcm = graycomatrix(np.array(arr), distances=[1], angles=[0, np.pi/4, np.pi/2, 3*np.pi/4], levels=4)
+        # properties = ['contrast', 'dissimilarity', 'homogeneity', 'ASM', 'energy', 'correlation', ]
+
+        # print(graycoprops(glcm, properties[0])[0]) # first value of result
+
+        glcm = graycomatrix(np.array(img), distances=[1], angles=[0, np.pi/4, np.pi/2, 3*np.pi/4], levels=256)
+        properties = ['contrast', 'dissimilarity', 'homogeneity', 'ASM', 'energy', 'correlation' ]
+        haralickVector = [0, 0, 0, 0, 0, 0]
+
+        for i in range(6):
+            haralickVector[i] = ( graycoprops(glcm, properties[i])[0][0] )
+        
+        print(properties)
+        print(haralickVector)
+
+
     else:
         # should never execute
         tellUser("Select an option...", labelUpdates)

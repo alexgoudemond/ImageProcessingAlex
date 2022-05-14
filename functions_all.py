@@ -39,6 +39,7 @@ global labelUpdates
 
 window = tk.Tk()
 window.title("COMP702 Image Processing")
+window.geometry("950x870+0+0")
 
 updateFrame = tk.Frame()
 

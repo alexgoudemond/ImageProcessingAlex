@@ -42,9 +42,9 @@ Create a folder called Images in the same directory as this and place Pics
 #----------------------------------------------------------------------------------------------------------------Packages Below
 # Encapsulating functions from our dedicated functions file
 from cv2 import resize
-from functions_all import   (chooseEnhancement, chooseMaliceOption, chooseMorphologyOption, chooseSegmentOption, chooseSharpeningOption, chooseSmoothingOption, 
-                            openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues,
-                            chooseMaskOption)
+from functions_all import   (chooseEnhancement, chooseFeatureRepresentationOption, chooseMaliceOption, chooseMorphologyOption,
+                            openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues, 
+                            chooseMaskOption, chooseSmoothingOption, chooseSegmentOption, chooseSharpeningOption)
 # global Vars to use
 from functions_all import window, labelUpdates, updateFrame
 
@@ -173,12 +173,13 @@ buttonMessUpImage = tk.Button(
     bg = "silver",
     command = chooseMaliceOption
 )
-button12 = tk.Button(
+buttonFeatureRepresentation = tk.Button(
     master = buttonFrameMiddle2,
-    text = "12",
+    text = "Get Feature Representations",
     width = 25,
     height = 5, 
     bg = "silver",
+    command = chooseFeatureRepresentationOption
 )
 button13 = tk.Button(
     master = buttonFrameMiddle2,
@@ -263,7 +264,7 @@ buttonMasks.pack(side = tk.LEFT)
 buttonSegmentation.pack(side = tk.RIGHT)
 
 buttonMessUpImage.pack(side = tk.LEFT)
-button12.pack(side = tk.LEFT)
+buttonFeatureRepresentation.pack(side = tk.LEFT)
 button13.pack(side = tk.LEFT)
 button14.pack(side = tk.LEFT)
 button15.pack(side = tk.RIGHT)

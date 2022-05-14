@@ -1981,7 +1981,41 @@ def executeMaliceChoice(intVal, img, imgName):
     else:
         # should never execute
         tellUser("Select an option...", labelUpdates)
+###
 
+#------------------------------------------------------------------------------------Feature Representation Functions-----------
+
+def chooseFeatureRepresentationOption():
+    print("Inside chooseFeatureRepresentationOption()")
+
+    window.filename = openGUI("Select an Image...")
+
+    imgGrayscale, success = getGray()
+
+    if (success):
+        featureRepWindow = Toplevel(window)
+        featureRepWindow.title("Choose a kind of malice...")
+        featureRepWindow.geometry("300x300")
+
+        threshOption = IntVar()
+        threshOption.set(0)
+
+        Radiobutton(featureRepWindow, text="Get Toplogical Descriptors", variable=threshOption, value=1, width=30).pack(anchor=W, side="top")
+        Radiobutton(featureRepWindow, text="Get Regional Descriptors", variable=threshOption, value=2, width=30).pack(anchor=W, side="top")
+        Radiobutton(featureRepWindow, text="Get Skeleton", variable=threshOption, value=3, width=30).pack(anchor=W, side="top")
+        Radiobutton(featureRepWindow, text="Get Co-Occurence Matrix", variable=threshOption, value=4, width=30).pack(anchor=W, side="top")
+        Radiobutton(featureRepWindow, text="Get Haralick Features", variable=threshOption, value=5, width=30).pack(anchor=W, side="top")
+
+        Button(featureRepWindow, text="Choose Segmentation Option", width=50, bg='gray',
+            # command=lambda: executeFeatureRepresntationChoice(intVal=threshOption.get(), img=imgGrayscale, imgName=window.filename)
+        ).pack(anchor=W, side="top")
+        Button(featureRepWindow, text="Close Plots", width=50, bg='gray',
+            command=lambda: ( plt.close("Feature Representation Changes") )
+        ).pack(anchor=W, side="top")
+    else:
+        tellUser("Unable to Get Grayscale Image for Feature Representation Window...", labelUpdates)
+    
+    return True
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 
@@ -2008,3 +2042,4 @@ def openGUI(message):
     )
 
     return temp
+###

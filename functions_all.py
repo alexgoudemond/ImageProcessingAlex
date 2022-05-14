@@ -31,6 +31,7 @@ from math import floor
 from skimage.segmentation import felzenszwalb # type of segmentation method
 from skimage.util import random_noise # several noise options
 from skimage import img_as_bool, morphology # Skeleton Code
+from skimage.feature import graycomatrix # Co-Occurence Matrix
 from PIL import Image
 
 # Global Vars below
@@ -2002,7 +2003,7 @@ def chooseFeatureRepresentationOption():
         featRepOption.set(0)
 
         Radiobutton(featureRepWindow, text="Get Skeleton", variable=featRepOption, value=1, width=30).pack(anchor=W, side="top")
-        Radiobutton(featureRepWindow, text="Get Co-Occurence Matrix", variable=featRepOption, value=2, width=30).pack(anchor=W, side="top")
+        Radiobutton(featureRepWindow, text="Download Co-Occurence Matrix", variable=featRepOption, value=2, width=30).pack(anchor=W, side="top")
         Radiobutton(featureRepWindow, text="Get Haralick Features", variable=featRepOption, value=3, width=30).pack(anchor=W, side="top")
 
         Button(featureRepWindow, text="Choose Segmentation Option", width=50, bg='gray',
@@ -2035,9 +2036,47 @@ def executeFeatureRepresentationChoice(intVal, img, imgName):
         labelArray = ["Original Image", "Skeleton"]
 
         plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
-        
-    # elif (intVal == 2):
-    #     ###
+
+    elif (intVal == 2):
+        # Co Occurence Matrix
+
+        # Test
+        # arr = [ [0, 0, 1, 1],
+        #         [0, 0, 1, 1],
+        #         [0, 2, 2, 2],
+        #         [2, 2, 3, 3] ]
+        # glcm = graycomatrix(np.array(arr), distances=[1], angles=[0, np.pi/4, np.pi/2, 3*np.pi/4], levels=4)
+        # print(glcm[:, :, 0, 0])
+
+        glcm = graycomatrix(np.array(img), distances=[1], angles=[0, np.pi/4, np.pi/2, 3*np.pi/4], levels=256)
+        (x, y) = img.shape
+
+        # [:, :, 0, 0] --> [i, j, d, theta] ; in other words, d==distance away==0, theta==angle==0
+        print(glcm[:, :, 0, 0])
+
+        currentDir = os.getcwd()
+        path = currentDir + "\Images\Reports"
+        try:
+            os.mkdir(path)
+        except:
+            pass
+
+        imgName = window.filename
+        fileName = "Co_Occurence_Report_" + getName(imgName)
+        fileName += "_" + getExtension(imgName) + ".txt"
+
+        completeName = os.path.join(path, fileName)
+        # x, y == 256 because glcm is a square matrix!
+        imageDescription = getMatrix(glcm[:, :, 0, 0], 256, 256, getName(window.filename) + "_" + getExtension(window.filename), "Co Occurence Matrix")
+        text_file = open(completeName, "w")
+        text_file.write(completeName+"\n\n")
+        text_file.write(imageDescription)
+
+        if(os.path.exists(completeName)):
+            tellUser("Co Occurence Matrix Downloaded successfully", labelUpdates) # Update
+        else:
+            tellUser("Unable to create file")
+
     # elif (intVal == 2):
     #     ###
     # elif (intVal == 2):
@@ -2047,6 +2086,20 @@ def executeFeatureRepresentationChoice(intVal, img, imgName):
     else:
         # should never execute
         tellUser("Select an option...", labelUpdates)
+###
+
+def getMatrix(matrix, x, y, fileName, message):
+    text = message + " " + fileName
+    text += "; Size: (" + str(x) + ", " + str(y) + ")\n"
+    text += "[ [\n"
+
+    for a in range(0, x):
+        for b in range(0, y):
+            text += str(matrix[a, b]) + " "
+        text += " <end>\n"
+    text += " ] ]"
+    
+    return text
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

@@ -1988,7 +1988,7 @@ def executeMaliceChoice(intVal, img, imgName):
 #------------------------------------------------------------------------------------Feature Representation Functions-----------
 
 def chooseFeatureRepresentationOption():
-    print("Inside chooseFeatureRepresentationOption()")
+    # print("Inside chooseFeatureRepresentationOption()")
 
     window.filename = openGUI("Select an Image...")
 
@@ -2019,7 +2019,7 @@ def chooseFeatureRepresentationOption():
 ###
 
 def executeFeatureRepresentationChoice(intVal, img, imgName):
-    print("Inside executeFeatureRepresentationChoice()")
+    # print("Inside executeFeatureRepresentationChoice()")
 
     fig = plt.figure(num="Feature Representation Changes", figsize=(8, 4))
     plt.clf() # Should clear last plot but keep window open? 
@@ -2090,14 +2090,35 @@ def executeFeatureRepresentationChoice(intVal, img, imgName):
         # print(graycoprops(glcm, properties[0])[0]) # first value of result
 
         glcm = graycomatrix(np.array(img), distances=[1], angles=[0, np.pi/4, np.pi/2, 3*np.pi/4], levels=256)
-        properties = ['contrast', 'dissimilarity', 'homogeneity', 'ASM', 'energy', 'correlation' ]
+        properties = ['contrast','dissimilarity','homogeneity','ASM','energy','correlation' ]
         haralickVector = [0, 0, 0, 0, 0, 0]
 
         for i in range(6):
-            haralickVector[i] = ( graycoprops(glcm, properties[i])[0][0] )
+            haralickVector[i] = ( graycoprops(glcm, properties[i] )[0][0] )
         
-        print(properties)
-        print(haralickVector)
+        # print(properties)
+        # print(haralickVector)
+
+        string = "\t Haralick Features: \n"
+
+        for i in range(6):
+            string += "{0:20}: {1} \n".format(properties[i], haralickVector[i])
+        print(string)
+
+
+        fig.add_subplot(numRows, numColumns, 1)
+        plt.imshow(img, cmap='gray')
+        plt.title("Original Image", wrap=True)
+        plt.axis('off') #Removes axes
+
+        fig.add_subplot(numRows, numColumns, 2)
+        # set the font globally
+        plt.rcParams.update({'font.family':'sans-serif'})
+        plt.text(0, 0.7, string, fontsize=12,verticalalignment='top')
+        plt.axis('off') #Removes axes
+
+        plt.tight_layout()
+        plt.show()
 
 
     else:

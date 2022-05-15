@@ -2143,7 +2143,7 @@ def getMatrix(matrix, x, y, fileName, message):
 #------------------------------------------------------------------------------------Image Transformation Functions-------------
 
 def chooseImageTransformation():
-    print("Inside chooseImageTransformationOption()")
+    # print("Inside chooseImageTransformationOption()")
 
     window.filename = openGUI("Select an Image...")
 
@@ -2158,9 +2158,7 @@ def chooseImageTransformation():
         imageTransformOption.set(0)
 
         Radiobutton(imageTransformationWindow, text="Apply Fourier Transform", variable=imageTransformOption, value=1, width=30).pack(anchor=W, side="top")
-        Radiobutton(imageTransformationWindow, text="Apply Hadamard Transform", variable=imageTransformOption, value=2, width=30).pack(anchor=W, side="top")
-        Radiobutton(imageTransformationWindow, text="Apply Cosine Transform", variable=imageTransformOption, value=3, width=30).pack(anchor=W, side="top")
-        Radiobutton(imageTransformationWindow, text="Apply Haar Transform", variable=imageTransformOption, value=4, width=30).pack(anchor=W, side="top")
+        Radiobutton(imageTransformationWindow, text="Apply Haar Transform", variable=imageTransformOption, value=2, width=30).pack(anchor=W, side="top")
 
         Button(imageTransformationWindow, text="Choose Segmentation Option", width=50, bg='gray',
             command=lambda: executeImageTransformationChoice(intVal=imageTransformOption.get(), img=imgGrayscale, imgName=window.filename)
@@ -2173,7 +2171,7 @@ def chooseImageTransformation():
 ###
 
 def executeImageTransformationChoice(intVal, img, imgName):
-    print("Inside executeImageTransformationOption()")
+    # print("Inside executeImageTransformationOption()")
 
     fig = plt.figure(num="Image Transformation Changes", figsize=(8, 4))
     plt.clf() # Should clear last plot but keep window open? 
@@ -2215,14 +2213,16 @@ def executeImageTransformationChoice(intVal, img, imgName):
 
         plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
-    # elif (intVal == 2):
-    #     # Hadamard Transform
+    elif (intVal == 2):
+        #Haar Transform
+        import mahotas
 
-    # elif (intVal == 3):
-    #     # Cosine Transform
+        haar_transform = mahotas.haar(img)
 
-    # elif (intVal == 4):
-    #     #Haar Transform
+        modifiedImageArray = [img, haar_transform]
+        labelArray = ["Original Image", "Haar Transform"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
     else:
         # should never execute

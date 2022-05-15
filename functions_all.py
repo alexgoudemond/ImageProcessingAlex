@@ -1996,7 +1996,7 @@ def chooseFeatureRepresentationOption():
 
     if (success):
         featureRepWindow = Toplevel(window)
-        featureRepWindow.title("Choose a kind of malice...")
+        featureRepWindow.title("Choose a kind of Feature Representation...")
         featureRepWindow.geometry("300x300")
 
         featRepOption = IntVar()
@@ -2138,6 +2138,95 @@ def getMatrix(matrix, x, y, fileName, message):
     text += " ] ]"
     
     return text
+###
+
+#------------------------------------------------------------------------------------Image Transformation Functions-------------
+
+def chooseImageTransformation():
+    # print("Inside chooseImageTransformationOption()")
+
+    window.filename = openGUI("Select an Image...")
+
+    imgGrayscale, success = getGray()
+
+    if (success):
+        imageTransformationWindow = Toplevel(window)
+        imageTransformationWindow.title("Choose a kind of Image Transformation...")
+        imageTransformationWindow.geometry("300x300")
+
+        imageTransformOption = IntVar()
+        imageTransformOption.set(0)
+
+        Radiobutton(imageTransformationWindow, text="Apply Fourier Transform", variable=imageTransformOption, value=1, width=30).pack(anchor=W, side="top")
+        Radiobutton(imageTransformationWindow, text="Apply Haar Transform", variable=imageTransformOption, value=2, width=30).pack(anchor=W, side="top")
+
+        Button(imageTransformationWindow, text="Choose Segmentation Option", width=50, bg='gray',
+            command=lambda: executeImageTransformationChoice(intVal=imageTransformOption.get(), img=imgGrayscale, imgName=window.filename)
+        ).pack(anchor=W, side="top")
+        Button(imageTransformationWindow, text="Close Plots", width=50, bg='gray',
+            command=lambda: ( plt.close("Image Transformation Changes") )
+        ).pack(anchor=W, side="top")
+    else:
+        tellUser("Unable to Get Grayscale Image for Image Transformation Window...", labelUpdates)
+###
+
+def executeImageTransformationChoice(intVal, img, imgName):
+    # print("Inside executeImageTransformationOption()")
+
+    fig = plt.figure(num="Image Transformation Changes", figsize=(8, 4))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1 # used in matplotlib function below
+    numColumns = 2 # used in matplotlib function below
+
+    if (intVal == 1):
+        # Fourier Transform
+        numRows = 2
+        numColumns = 2
+
+        # discrete fourier transformation
+        dft = cv2.dft(np.float32(img),flags = cv2.DFT_COMPLEX_OUTPUT)
+        dft_shift = np.fft.fftshift(dft)
+        magnitude_spectrum = 20 * np.log(cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1])) # fourier transformed image
+
+        rows, cols = img.shape
+        crow, ccol = rows//2 , cols//2
+
+        # create a mask first, center square is 1, remaining all zeros
+        mask1 = np.zeros((rows,cols,2),np.uint8)
+        mask1[crow-30:crow+30, ccol-30:ccol+30] = 1
+
+        # apply mask and inverse DFT --> Low Pass Filter
+        fshift_low_pass = dft_shift*mask1
+        f_ishift_low_pass = np.fft.ifftshift(fshift_low_pass)
+        img_back_low_pass = cv2.idft(f_ishift_low_pass)
+        img_back_low_pass = cv2.magnitude(img_back_low_pass[:,:,0],img_back_low_pass[:,:,1])
+
+        # High Pass Filter
+        mask2 = np.fft.fftshift(np.fft.fft2(img))
+        mask2[crow-30:crow+30, ccol-30:ccol+30] = 0
+        f_ishift_high_pass = np.fft.ifftshift(mask2)
+        img_back_high_pass = np.fft.ifft2(f_ishift_high_pass)
+        img_back_high_pass = np.log(np.abs(img_back_high_pass))
+
+        modifiedImageArray = [img, magnitude_spectrum, img_back_low_pass, img_back_high_pass]
+        labelArray = ["Original Image", "Magnitude Spectrum", "Low Pass Filter", "High Pass Filter"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 2):
+        #Haar Transform
+        import mahotas
+
+        haar_transform = mahotas.haar(img)
+
+        modifiedImageArray = [img, haar_transform]
+        labelArray = ["Original Image", "Haar Transform"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

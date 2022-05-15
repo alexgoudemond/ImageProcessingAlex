@@ -2175,8 +2175,45 @@ def chooseImageTransformation():
 def executeImageTransformationChoice(intVal, img, imgName):
     print("Inside executeImageTransformationOption()")
 
-    # if (intVal == 1):
-    #     # Fourier Transform
+    fig = plt.figure(num="Image Transformation Changes", figsize=(8, 4))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1 # used in matplotlib function below
+    numColumns = 2 # used in matplotlib function below
+
+    if (intVal == 1):
+        # Fourier Transform
+        numRows = 2
+        numColumns = 2
+
+        # discrete fourier transformation
+        dft = cv2.dft(np.float32(img),flags = cv2.DFT_COMPLEX_OUTPUT)
+        dft_shift = np.fft.fftshift(dft)
+        magnitude_spectrum = 20 * np.log(cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1])) # fourier transformed image
+
+        rows, cols = img.shape
+        crow, ccol = rows//2 , cols//2
+
+        # create a mask first, center square is 1, remaining all zeros
+        mask1 = np.zeros((rows,cols,2),np.uint8)
+        mask1[crow-30:crow+30, ccol-30:ccol+30] = 1
+
+        # apply mask and inverse DFT --> Low Pass Filter
+        fshift_low_pass = dft_shift*mask1
+        f_ishift_low_pass = np.fft.ifftshift(fshift_low_pass)
+        img_back_low_pass = cv2.idft(f_ishift_low_pass)
+        img_back_low_pass = cv2.magnitude(img_back_low_pass[:,:,0],img_back_low_pass[:,:,1])
+
+        # High Pass Filter
+        mask2 = np.fft.fftshift(np.fft.fft2(img))
+        mask2[crow-30:crow+30, ccol-30:ccol+30] = 0
+        f_ishift_high_pass = np.fft.ifftshift(mask2)
+        img_back_high_pass = np.fft.ifft2(f_ishift_high_pass)
+        img_back_high_pass = np.log(np.abs(img_back_high_pass))
+
+        modifiedImageArray = [img, magnitude_spectrum, img_back_low_pass, img_back_high_pass]
+        labelArray = ["Original Image", "Magnitude Spectrum", "Low Pass Filter", "High Pass Filter"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 
     # elif (intVal == 2):
     #     # Hadamard Transform
@@ -2187,9 +2224,9 @@ def executeImageTransformationChoice(intVal, img, imgName):
     # elif (intVal == 4):
     #     #Haar Transform
 
-    # else:
-    #     # should never execute
-    #     tellUser("Select an option...", labelUpdates)
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

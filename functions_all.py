@@ -1996,7 +1996,7 @@ def chooseFeatureRepresentationOption():
 
     if (success):
         featureRepWindow = Toplevel(window)
-        featureRepWindow.title("Choose a kind of malice...")
+        featureRepWindow.title("Choose a kind of Feature Representation...")
         featureRepWindow.geometry("300x300")
 
         featRepOption = IntVar()
@@ -2138,6 +2138,58 @@ def getMatrix(matrix, x, y, fileName, message):
     text += " ] ]"
     
     return text
+###
+
+#------------------------------------------------------------------------------------Image Transformation Functions-------------
+
+def chooseImageTransformation():
+    print("Inside chooseImageTransformationOption()")
+
+    window.filename = openGUI("Select an Image...")
+
+    imgGrayscale, success = getGray()
+
+    if (success):
+        imageTransformationWindow = Toplevel(window)
+        imageTransformationWindow.title("Choose a kind of Image Transformation...")
+        imageTransformationWindow.geometry("300x300")
+
+        imageTransformOption = IntVar()
+        imageTransformOption.set(0)
+
+        Radiobutton(imageTransformationWindow, text="Apply Fourier Transform", variable=imageTransformOption, value=1, width=30).pack(anchor=W, side="top")
+        Radiobutton(imageTransformationWindow, text="Apply Hadamard Transform", variable=imageTransformOption, value=2, width=30).pack(anchor=W, side="top")
+        Radiobutton(imageTransformationWindow, text="Apply Cosine Transform", variable=imageTransformOption, value=3, width=30).pack(anchor=W, side="top")
+        Radiobutton(imageTransformationWindow, text="Apply Haar Transform", variable=imageTransformOption, value=4, width=30).pack(anchor=W, side="top")
+
+        Button(imageTransformationWindow, text="Choose Segmentation Option", width=50, bg='gray',
+            command=lambda: executeImageTransformationChoice(intVal=imageTransformOption.get(), img=imgGrayscale, imgName=window.filename)
+        ).pack(anchor=W, side="top")
+        Button(imageTransformationWindow, text="Close Plots", width=50, bg='gray',
+            command=lambda: ( plt.close("Image Transformation Changes") )
+        ).pack(anchor=W, side="top")
+    else:
+        tellUser("Unable to Get Grayscale Image for Image Transformation Window...", labelUpdates)
+###
+
+def executeImageTransformationChoice(intVal, img, imgName):
+    print("Inside executeImageTransformationOption()")
+
+    # if (intVal == 1):
+    #     # Fourier Transform
+
+    # elif (intVal == 2):
+    #     # Hadamard Transform
+
+    # elif (intVal == 3):
+    #     # Cosine Transform
+
+    # elif (intVal == 4):
+    #     #Haar Transform
+
+    # else:
+    #     # should never execute
+    #     tellUser("Select an option...", labelUpdates)
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

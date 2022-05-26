@@ -33,6 +33,8 @@ from skimage.util import random_noise # several noise options
 from skimage import img_as_bool, morphology # Skeleton Code
 from skimage.feature import graycomatrix, graycoprops # Co-Occurence Matrix and Haralick Features
 from PIL import Image
+from mahotas import haar # used for haar transform
+from scipy import fft # used for dct
 
 # Global Vars below
 global window 
@@ -2159,6 +2161,7 @@ def chooseImageTransformation():
 
         Radiobutton(imageTransformationWindow, text="Apply Fourier Transform", variable=imageTransformOption, value=1, width=30).pack(anchor=W, side="top")
         Radiobutton(imageTransformationWindow, text="Apply Haar Transform", variable=imageTransformOption, value=2, width=30).pack(anchor=W, side="top")
+        Radiobutton(imageTransformationWindow, text="Apply Discrete Cosine Transform", variable=imageTransformOption, value=3, width=30).pack(anchor=W, side="top")
 
         Button(imageTransformationWindow, text="Choose Segmentation Option", width=50, bg='gray',
             command=lambda: executeImageTransformationChoice(intVal=imageTransformOption.get(), img=imgGrayscale, imgName=window.filename)
@@ -2215,12 +2218,21 @@ def executeImageTransformationChoice(intVal, img, imgName):
 
     elif (intVal == 2):
         #Haar Transform
-        import mahotas
 
-        haar_transform = mahotas.haar(img)
+        # haar method comes from mahotas package
+        haar_transform = haar(img)
 
         modifiedImageArray = [img, haar_transform]
         labelArray = ["Original Image", "Haar Transform"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    elif (intVal == 3):
+        # Discrete Cosine Transform, from scipy package
+        dct_img = fft.dct(img)
+
+        modifiedImageArray = [img, dct_img]
+        labelArray = ["Original Image", "DCT Image"]
 
         plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
 

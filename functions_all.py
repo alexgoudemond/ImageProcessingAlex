@@ -34,7 +34,9 @@ from skimage import img_as_bool, morphology # Skeleton Code
 from skimage.feature import graycomatrix, graycoprops # Co-Occurence Matrix and Haralick Features
 from PIL import Image
 from mahotas import haar # used for haar transform
-from scipy import fft # used for dct
+from scipy import fft # used for dct transform
+from numpy import r_ # used in DCT compression
+from scipy.fftpack import dct, idct
 
 # Global Vars below
 global window 
@@ -2259,7 +2261,6 @@ def chooseCompression():
         compressOption.set(0)
 
         Radiobutton(compressionWindow, text="Apply DCT Compression", variable=compressOption, value=1, width=30).pack(anchor=W, side="top")
-        Radiobutton(compressionWindow, text="Apply DWT Compression", variable=compressOption, value=2, width=30).pack(anchor=W, side="top")
 
         Button(compressionWindow, text="Choose Compresion Option", width=50, bg='gray',
             command=lambda: executeCompressionChoice(intVal=compressOption.get(), img=imgGrayscale, imgName=window.filename)
@@ -2271,6 +2272,8 @@ def chooseCompression():
         tellUser("Unable to Get Grayscale Image for Compression Window...", labelUpdates)
 ###
 
+
+
 def executeCompressionChoice(intVal, img, imgName):
     print("Inside executeCompressionOption()")
 
@@ -2278,6 +2281,53 @@ def executeCompressionChoice(intVal, img, imgName):
     plt.clf() # Should clear last plot but keep window open? 
     numRows = 1 # used in matplotlib function below
     numColumns = 2 # used in matplotlib function below
+
+    if (intVal == 1):
+        # DCT compression
+
+        imgsize = img.shape
+        dct = np.zeros(imgsize)
+
+        # Do 8x8 DCT on image (in-place)
+        for i in r_[:imgsize[0]:8]:
+            for j in r_[:imgsize[1]:8]:
+                dct[i:(i+8),j:(j+8)] = dct2( img[i:(i+8),j:(j+8)] )
+
+        pos = 128
+        # 8X8 image block
+        img_slice = img[pos:pos+8,pos:pos+8]
+        # An 8X8 dct block
+        dct_slice = dct[pos:pos+8,pos:pos+8]
+
+        # Threshold our dct image
+        thresh = 0.012
+        dct_thresh = dct * (abs(dct) > (thresh*np.max(dct)))
+
+        # Use thresholded image to compress
+        img_idct = np.zeros(imgsize)
+
+        for i in r_[:imgsize[0]:8]:
+            for j in r_[:imgsize[1]:8]:
+                img_idct[i:(i+8),j:(j+8)] = idct2( dct_thresh[i:(i+8),j:(j+8)] )
+
+        numRows = 2
+        numColumns = 3
+        modifiedImageArray = [img, dct, img_slice, dct_slice, dct_thresh, img_idct]
+        labelArray = ["Original Image", "DCT Image", "An 8X8 Image block", "An 8X8 DCT Block", "DCT Thresholding", "Using DCT to compress"]
+
+        plotImagesSideBySide(fig, modifiedImageArray, imgName, labelArray, numRows, numColumns)
+
+    else:
+        # should never execute
+        tellUser("Select an option...", labelUpdates)
+###
+
+def dct2(a):
+    return dct( dct( a, axis=0, norm='ortho' ), axis=1, norm='ortho' )
+###
+
+def idct2(a):
+    return idct( idct( a, axis=0 , norm='ortho'), axis=1 , norm='ortho')
 ###
 
 #------------------------------------------------------------------------------------Other Functions Below----------------------

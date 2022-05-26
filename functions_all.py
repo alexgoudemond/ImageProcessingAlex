@@ -2241,6 +2241,45 @@ def executeImageTransformationChoice(intVal, img, imgName):
         tellUser("Select an option...", labelUpdates)
 ###
 
+#------------------------------------------------------------------------------------Compression Functions Below----------------
+
+def chooseCompression():
+    # print("Inside chooseImageTransformationOption()")
+
+    window.filename = openGUI("Select an Image...")
+
+    imgGrayscale, success = getGray()
+
+    if (success):
+        compressionWindow = Toplevel(window)
+        compressionWindow.title("Choose a kind of Image Transformation...")
+        compressionWindow.geometry("300x300")
+
+        compressOption = IntVar()
+        compressOption.set(0)
+
+        Radiobutton(compressionWindow, text="Apply DCT Compression", variable=compressOption, value=1, width=30).pack(anchor=W, side="top")
+        Radiobutton(compressionWindow, text="Apply DWT Compression", variable=compressOption, value=2, width=30).pack(anchor=W, side="top")
+
+        Button(compressionWindow, text="Choose Compresion Option", width=50, bg='gray',
+            command=lambda: executeCompressionChoice(intVal=compressOption.get(), img=imgGrayscale, imgName=window.filename)
+        ).pack(anchor=W, side="top")
+        Button(compressionWindow, text="Close Plots", width=50, bg='gray',
+            command=lambda: ( plt.close("Compression Changes") )
+        ).pack(anchor=W, side="top")
+    else:
+        tellUser("Unable to Get Grayscale Image for Compression Window...", labelUpdates)
+###
+
+def executeCompressionChoice(intVal, img, imgName):
+    print("Inside executeCompressionOption()")
+
+    fig = plt.figure(num="Compression Changes", figsize=(8, 4))
+    plt.clf() # Should clear last plot but keep window open? 
+    numRows = 1 # used in matplotlib function below
+    numColumns = 2 # used in matplotlib function below
+###
+
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 
 # places updated label for user

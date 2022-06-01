@@ -42,7 +42,7 @@ Create a folder called Images in the same directory as this and place Pics
 #----------------------------------------------------------------------------------------------------------------Packages Below
 # Encapsulating functions from our dedicated functions file
 from cv2 import resize
-from functions_all import   (chooseCompression, chooseEnhancement, chooseFeatureRepresentationOption, chooseImageTransformation,
+from functions_all import   (bulkResize, chooseCompression, chooseEnhancement, chooseFeatureRepresentationOption, chooseImageTransformation,
                             openTheImage, convertTheImage, getBWIntensityValues, downloadBWIntensityValues, 
                             chooseMaskOption, chooseSmoothingOption, chooseSegmentOption, chooseSharpeningOption,
                             chooseMaliceOption, chooseMorphologyOption,)
@@ -198,12 +198,13 @@ buttonCompressions = tk.Button(
     bg = "silver",
     command = chooseCompression
 )
-button15 = tk.Button(
+buttonBulkResize = tk.Button(
     master = buttonFrameMiddle2,
-    text = "15",
+    text = "Bulk Resize Dataset Images",
     width = 25,
     height = 5, 
     bg = "silver",
+    command = bulkResize
 )
 button16 = tk.Button(
     master = buttonFrameBottom,
@@ -270,7 +271,7 @@ buttonMessUpImage.pack(side = tk.LEFT)
 buttonFeatureRepresentation.pack(side = tk.LEFT)
 buttonImageTransformation.pack(side = tk.LEFT)
 buttonCompressions.pack(side = tk.LEFT)
-button15.pack(side = tk.RIGHT)
+buttonBulkResize.pack(side = tk.RIGHT)
 
 button16.pack(side = tk.LEFT)
 button17.pack(side = tk.LEFT)

@@ -2330,6 +2330,36 @@ def idct2(a):
     return idct( idct( a, axis=0 , norm='ortho'), axis=1 , norm='ortho')
 ###
 
+#------------------------------------------------------------------------------------Bulk Resize Functions Below----------------
+
+def bulkResize():
+    print("Inside bulkResize()")
+
+    currentDir = os.getcwd()
+    folder = "\\Images\\Notes_DataSet"
+    path = os.walk(currentDir + folder)
+    destinationFolder = currentDir + "\\Images\\Resized_Notes_DataSet"
+
+    # create directory
+    try:
+        os.mkdir(destinationFolder)
+    except FileExistsError as uhoh:
+        pass
+    except Exception as uhoh:
+        print("New Error:", uhoh)
+        pass
+    
+    i = 0
+    for root, directories, files in path:
+        for file in files:
+            temp = currentDir + folder + "\\" + file
+            image = cv2.imread(temp, cv2.IMREAD_COLOR)
+            print(i)
+            resizedImage = cv2.resize(image, (1024, 512))
+            cv2.imwrite(destinationFolder + "\\" + file, resizedImage)
+            i += 1
+###
+
 #------------------------------------------------------------------------------------Other Functions Below----------------------
 
 # places updated label for user

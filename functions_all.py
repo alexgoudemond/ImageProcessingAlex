@@ -33,7 +33,7 @@ from skimage.util import random_noise # several noise options
 from skimage import img_as_bool, morphology # Skeleton Code
 from skimage.feature import graycomatrix, graycoprops # Co-Occurence Matrix and Haralick Features
 from PIL import Image
-from mahotas import haar # used for haar transform
+# from mahotas import haar # used for haar transform
 from scipy import fft # used for dct
 
 # Global Vars below
